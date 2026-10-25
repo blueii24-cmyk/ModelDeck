@@ -54,3 +54,11 @@ npm test
 ```
 
 Tests cover prompts, settings, appearance, saved history, mobile navigation, layout overflow, and a mocked provider response. Live provider calls require your own credentials and are not exercised by the tests. Set `CHROMIUM_PATH` to use an existing Chromium executable.
+
+## Built-in website preview
+
+Choose **Build something**, or ask a model for a self-contained website in an `html` code fence. Completed HTML replies get a **Preview website** button. Separate CSS and JavaScript fences in the same reply are combined with the first HTML block. Full raw HTML documents also work; JSX/React source and build-tool projects are not compiled by this feature.
+
+The preview includes Preview/Code views, a temporary editable HTML buffer, **Run edits**, reload, desktop/mobile widths, and HTML download. Changing conversations closes the preview. Edits do not overwrite the original response or persist across closing/reloading; download them to keep them.
+
+Generated code runs only after opening the preview, in an iframe with `sandbox="allow-scripts"` and without same-origin access. A restrictive CSP blocks fetches, external scripts/styles/images, nested frames, and form submissions. Inline JavaScript works; the preview cannot read ModelDeck's local storage. This is not a general-purpose hostile-code runtime: generated scripts can still consume browser resources. Inspect untrusted code before running it. Downloaded HTML runs outside this sandbox when opened separately.
