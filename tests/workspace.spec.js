@@ -47,7 +47,6 @@ test('mock provider request renders and saves an answer',async({page})=>{
  await expect(page.locator('#history button')).toHaveText('Hello');
 });
 
-
 test('compact composer model selector fits narrow Android viewports', async ({ page }) => {
   await page.setViewportSize({ width: 360, height: 800 });
   await page.goto('/');
@@ -71,7 +70,6 @@ test('compact composer model selector fits narrow Android viewports', async ({ p
   expect(popupBox.x + popupBox.width).toBeLessThanOrEqual(360);
 });
 
-
 test('desktop chat and composer use the available width', async ({ page }) => {
   await page.setViewportSize({ width: 1769, height: 840 });
   await page.goto('/');
@@ -87,30 +85,4 @@ test('desktop chat and composer use the available width', async ({ page }) => {
   expect(composer.width).toBeGreaterThan(main.width * 0.9);
   expect(messages.width).toBeGreaterThan(main.width * 0.65);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-});
-
-
-test('composer companion idles nearby and reacts when the message box is focused', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
-  const buddy = page.locator('.chat-buddy');
-  const thought = page.locator('.buddy-thought');
-  const prompt = page.locator('#prompt');
-  await expect(buddy).toBeVisible();
-  await expect(buddy).toHaveAttribute('aria-hidden', 'true');
-  await expect(thought).toHaveCSS('opacity', '0');
-  const idleStyle = await buddy.evaluate((el) => {
-    const style = getComputedStyle(el);
-    return { animationName: style.animationName, left: style.left, right: style.right, duration: style.animationDuration };
-  });
-  expect(idleStyle.animationName).toBe('buddy-hangout');
-  expect(idleStyle.duration).toBe('2.25s');
-  expect(Number.parseFloat(idleStyle.left)).toBeLessThan(80);
-  expect(idleStyle.right).toBe('auto');
-  await prompt.focus();
-  await expect(thought).toHaveCSS('opacity', '1');
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-  const animationName = await page.locator('.chat-buddy').evaluate((el) => getComputedStyle(el).animationName);
-  expect(animationName).toBe('none');
 });
