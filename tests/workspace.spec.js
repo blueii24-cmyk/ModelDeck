@@ -86,3 +86,49 @@ test('desktop chat and composer use the available width', async ({ page }) => {
   expect(messages.width).toBeGreaterThan(main.width * 0.65);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+
+test('chat picker filters to confirmed free models and supports OpenRouter Free Auto', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => localStorage.setItem('modeldeck-ghpages-v2', JSON.stringify({
+    connections: [{
+      id: 'or-free-test',
+      name: 'OpenRouter test',
+      provider: 'openrouter',
+      apiKey: 'test-only-key',
+      baseUrl: 'https://openrouter.ai/api/v1',
+      model: 'paid-chat',
+      chatFreeOnly: false,
+      freeModelsOnly: false,
+      availableModels: [
+        { id: 'sounding:free', name: 'Free Chat', provider: 'openrouter', metadataVersion: 1, pricingStatus: 'free', capabilities: ['text'], capabilitySource: 'provider metadata' },
+        { id: 'paid-chat', name: 'Paid Chat', provider: 'openrouter', metadataVersion: 1, pricingStatus: 'paid', capabilities: ['text'], capabilitySource: 'provider metadata' },
+        { id: 'unknown-chat', name: 'Unknown Price', provider: 'openrouter', metadataVersion: 1, pricingStatus: 'unknown', capabilities: ['text'], capabilitySource: 'provider metadata' }
+      ]
+    }],
+    selectedConnectionId: 'or-free-test',
+    chats: []
+  })));
+  await page.goto('/');
+  const picker = page.locator('.composer-model-picker');
+  await picker.getByRole('button', { name: 'Switch model', exact: true }).click();
+
+  await expect(picker.getByRole('option', { name: /Free Auto/ })).toBeVisible();
+  await expect(picker.getByRole('option', { name: /Paid Chat/ })).toBeVisible();
+  await expect(picker.getByRole('option', { name: /Unknown Price/ })).toBeVisible();
+
+  const freeToggle = picker.getByRole('button', { name: 'Free models only', exact: true });
+  await expect(freeToggle).toHaveAttribute('aria-pressed', 'false');
+  await freeToggle.click();
+  await expect(freeToggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(picker.getByRole('option', { name: /Free Chat/ })).toBeVisible();
+  await expect(picker.getByRole('option', { name: /Paid Chat/ })).toHaveCount(0);
+  await expect(picker.getByRole('option', { name: /Unknown Price/ })).toHaveCount(0);
+  await expect(picker.getByRole('option', { name: /Free Auto/ })).toBeVisible();
+
+  await picker.getByRole('option', { name: /Free Auto/ }).click();
+  await expect(picker.getByRole('button', { name: 'Switch model', exact: true })).toContainText('Free Auto');
+  const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('modeldeck-ghpages-v2')));
+  expect(persisted.connections[0].model).toBe('openrouter/free');
+  expect(persisted.connections[0].chatFreeOnly).toBe(true);
+});

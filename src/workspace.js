@@ -42,13 +42,22 @@ function publishDashboard(){
     const c=selected?.provider===id?selected:state.connections.find(c=>c.provider===id);
     return {id,name:p.name,model:c?.model||p.defaultModel,metadata:modelInfo(c||{provider:id,model:p.defaultModel}),configured:!!c&&(!!c.apiKey||id==='omniroute'),selected:c?.id===selected?.id,status:connectionStatus(c)};
   });
-  window.dispatchEvent(new CustomEvent('deck:state',{detail:{providers:list,connections:state.connections.map(c=>({id:c.id,name:c.name,status:connectionStatus(c)})),selected:{name:providers[selected?.provider]?.name||'No provider',model:active?.model||selected?.model,metadata:modelInfo(selected,active?.model||selected?.model),models:[...new Map([modelInfo(selected,active?.model||selected?.model),...(selected?.availableModels||[]).map(m=>describeModel(selected.provider,m))].filter(m=>m.id).map(m=>[m.id,m])).values()],status:connectionStatus(selected),count:selected?.availableModels?.length||0},chats:state.chats.length,busy}}));
+  window.dispatchEvent(new CustomEvent('deck:state',{detail:{providers:list,connections:state.connections.map(c=>({id:c.id,name:c.name,status:connectionStatus(c)})),selected:{name:providers[selected?.provider]?.name||'No provider',provider:selected?.provider||'',chatFreeOnly:selected?.chatFreeOnly===true,model:active?.model||selected?.model,metadata:modelInfo(selected,active?.model||selected?.model),models:[...new Map([modelInfo(selected,active?.model||selected?.model),...(selected?.availableModels||[]).map(m=>describeModel(selected.provider,m))].filter(m=>m.id).map(m=>[m.id,m])).values()],status:connectionStatus(selected),count:selected?.availableModels?.length||0},chats:state.chats.length,busy}}));
 }
 function chooseConnection(c){if(busy){notice('Wait for the current response before changing connections.');return}active=null;syncConnection(c);persist();render();window.dispatchEvent(new Event('modeldeck:conversation'))}
 window.addEventListener('deck:action',e=>{
   const {action,provider,id}=e.detail;
   if(action==='chat'){window.dispatchEvent(new CustomEvent('modeldeck:view',{detail:{view:'chat'}}));return}
   if(action==='pick-model'){setModel(currentConnection().provider,id);return}
+  if(action==='toggle-chat-free-only'){
+    const connection=currentConnection();
+    if(!connection||connection.provider!=='openrouter')return;
+    connection.chatFreeOnly=connection.chatFreeOnly!==true;
+    persist();
+    publishDashboard();
+    notice(connection.chatFreeOnly?'Free-only model list enabled. Paid and unknown models are hidden, not deleted.':'Showing all saved models again.');
+    return;
+  }
   if(action==='snapshot'){publishDashboard();return}
   if(action==='settings'){openSettings('connections');return}
   if(action==='models'){openSettings('models');return}

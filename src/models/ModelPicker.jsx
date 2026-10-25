@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ChevronDown, Settings2 } from "lucide-react";
+import { ChevronDown, Settings2, Gift, Sparkles, Check } from "lucide-react";
 import { useDeck, dashboardAction } from "../Dashboard";
 import { CapabilityBadges } from "./ModelCapabilities";
 function compactModelName(value) {
   const id = String(value || "Choose model");
+  if (id === "openrouter/free") return "Free Auto";
   const withoutNamespace = id.includes("/") ? id.split("/").filter(Boolean).at(-1) || id : id;
   return withoutNamespace.length > 25 ? withoutNamespace.slice(0, 22) + "…" : withoutNamespace;
 }
@@ -18,8 +19,19 @@ export default function ModelPicker({ placement = "header" }) {
   const root = useRef(null),
     trigger = useRef(null),
     search = useRef(null);
+  const supportsFreeRouting = data?.selected.provider === "openrouter";
+  const freeModelsOnly = data?.selected.chatFreeOnly === true;
+  const normalizedQuery = query.trim().toLowerCase();
+  const showFreeAuto =
+    supportsFreeRouting &&
+    (!normalizedQuery ||
+      ["free", "auto", "router", "openrouter/free"].some(
+        (term) => term.includes(normalizedQuery) || normalizedQuery.includes(term),
+      ));
   const models = (data?.selected.models || []).filter((m) =>
-    (m.id + " " + m.name).toLowerCase().includes(query.toLowerCase()),
+    m.id !== "openrouter/free" &&
+    (!freeModelsOnly || m.pricingStatus === "free") &&
+    (m.id + " " + m.name).toLowerCase().includes(normalizedQuery),
   );
   const close = () => {
     setOpen(false);
@@ -110,7 +122,46 @@ export default function ModelPicker({ placement = "header" }) {
               placeholder="Model name or ID"
             />
           </label>
+          {supportsFreeRouting && (
+            <div className="picker-free-tools">
+              <button
+                className={"picker-free-toggle" + (freeModelsOnly ? " is-active" : "")}
+                type="button"
+                aria-label="Free models only"
+                aria-pressed={freeModelsOnly}
+                title="Filter this list to models with confirmed free pricing"
+                disabled={data.busy}
+                onClick={() => dashboardAction("toggle-chat-free-only")}
+              >
+                <Gift size={14} />
+                <span>Free models only</span>
+                <span className="picker-free-toggle-state">
+                  {freeModelsOnly ? <Check size={12} /> : "OFF"}
+                </span>
+              </button>
+              <p>Only models confirmed free by OpenRouter are shown when enabled.</p>
+            </div>
+          )}
           <div role="listbox" id="richModelOptions" aria-label="Saved models">
+            {showFreeAuto && (
+              <button
+                role="option"
+                type="button"
+                className="picker-free-auto"
+                aria-selected={data.selected.model === "openrouter/free"}
+                disabled={data.busy}
+                onClick={() => {
+                  dashboardAction("pick-model", { id: "openrouter/free" });
+                  close();
+                }}
+              >
+                <span className="picker-free-auto-copy">
+                  <span className="picker-free-auto-title"><Sparkles size={14} /> Free Auto</span>
+                  <small>Automatically choose an available free model</small>
+                </span>
+                <span className="free-badge">FREE</span>
+              </button>
+            )}
             {models.map((m) => (
               <button
                 role="option"
