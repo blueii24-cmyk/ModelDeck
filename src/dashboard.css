@@ -1,0 +1,1319 @@
+/* Dashboard theme: dark by default; saved light/system preferences remain available. */
+:root,
+html[data-mode="dark"],
+html[data-mode="system"] {
+  color-scheme: dark;
+  --bg: #101214;
+  --panel: #181b1e;
+  --panel2: #24272a;
+  --sidebar: #141719;
+  --text: #ecebe5;
+  --muted: #979c9d;
+  --line: #2c3033;
+  --accent: #d9a052;
+  --accent-soft: #d9a05216;
+  --bubble: #292b28;
+  --friend-face: #252a2b;
+  --shadow: 0 6px 20px #0002;
+}
+html[data-accent="blue"] {
+  --accent: #d9a052;
+  --accent-soft: #d9a05216;
+}
+html[data-mode="light"] {
+  color-scheme: light;
+  --bg: #eeeef0;
+  --panel: #fafaf8;
+  --panel2: #e5e5df;
+  --sidebar: #e8e9e6;
+  --text: #252b2c;
+  --muted: #666e70;
+  --line: #d1d5d3;
+  --bubble: #e0e4db;
+  --friend-face: #d9dccb;
+}
+@media (prefers-color-scheme: light) {
+  html[data-mode="system"] {
+    color-scheme: light;
+    --bg: #eeeef0;
+    --panel: #fafaf8;
+    --panel2: #e5e5df;
+    --sidebar: #e8e9e6;
+    --text: #252b2c;
+    --muted: #666e70;
+    --line: #d1d5d3;
+    --bubble: #e0e4db;
+  }
+}
+.app {
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+.side {
+  padding: 27px 16px 18px;
+  position: relative;
+}
+.brand {
+  font-size: 23px;
+  letter-spacing: -1px;
+}
+.brand-icon {
+  color: var(--accent);
+}
+.side-caption {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  margin-bottom: 26px;
+}
+.new {
+  background: var(--accent);
+  color: #1a1b18;
+  border: 1px solid #e0b16d;
+  box-shadow: 0 2px 0 #987440;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+.new:hover {
+  background: #e2ad66;
+}
+.navbtn {
+  color: var(--muted);
+  min-height: 42px;
+}
+.playground-nav {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-left: 2px solid var(--accent);
+  border-radius: 2px;
+}
+.side-label {
+  font-size: 9px;
+  margin-top: 12px;
+}
+.history {
+  flex: 1;
+}
+.history button[aria-current="true"] {
+  color: var(--text);
+  border-left: 2px solid var(--accent);
+  border-radius: 2px;
+}
+.empty-history {
+  font-size: 11px;
+}
+.connection-card {
+  display: none;
+}
+.sidebar-footer {
+  font-size: 7px;
+}
+.collapse-sidebar {
+  position: absolute;
+  top: 81px;
+  right: -12px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  color: var(--muted);
+  width: 24px;
+  height: 24px;
+  z-index: 3;
+  border-radius: 4px;
+}
+.top {
+  flex-basis: 73px;
+  padding: 0 28px;
+}
+.micro-label {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+}
+.modelpick {
+  font-size: 12px;
+  color: var(--text);
+}
+select option {
+  background: var(--panel);
+  color: var(--text);
+}
+.model-indicator {
+  background: var(--muted);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.connection-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text);
+}
+.connection-badge > span {
+  color: var(--muted);
+}
+.connection-badge i {
+  background: #74787a;
+}
+.connection-badge i.verified,
+.card-dot.verified,
+.status-dot.verified {
+  background: #8faf85;
+  box-shadow: 0 0 7px #8faf8520;
+}
+.dashboard-scroll {
+  overflow: auto;
+  min-height: 0;
+  flex: 1;
+  padding: 0 28px;
+  scroll-behavior: smooth;
+}
+.dashboard {
+  padding: 29px 0 25px;
+  min-width: 0;
+}
+.dashboard-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+.dashboard-intro h1 {
+  font:
+    38px/1.2 "Pixelify Sans",
+    monospace;
+  letter-spacing: -0.7px;
+  margin: 9px 0;
+}
+.dashboard-intro h1 > span {
+  color: var(--accent);
+}
+.dashboard-intro p {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0;
+}
+.local-badge {
+  border: 1px solid var(--line);
+  padding: 8px 10px;
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  border-radius: 3px;
+}
+.local-badge svg {
+  color: #8faf85;
+}
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 27px 0 13px;
+}
+.section-title h2 {
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title h2 svg {
+  color: var(--accent);
+}
+.section-title > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+}
+.section-title button {
+  display: grid;
+  place-items: center;
+  width: 25px;
+  height: 25px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 3px;
+}
+.model-gallery {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 2px 1px 10px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: #454440 transparent;
+}
+.model-card {
+  flex: 0 0 180px;
+  min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+  scroll-snap-align: start;
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s;
+  position: relative;
+}
+.model-card:hover {
+  border-color: #62605a;
+}
+.model-card.selected {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px #d9a05218,
+    0 0 24px #d9a05208;
+}
+.model-card.selected:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: #f5d7a5;
+  animation: selection-glow 3s ease-in-out infinite;
+}
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 11px 0;
+  font:
+    7px "IBM Plex Mono",
+    monospace;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+}
+.card-dot,
+.status-dot {
+  width: 5px;
+  height: 5px;
+  flex-shrink: 0;
+  background: #62676a;
+  display: inline-block;
+}
+.avatar-scene {
+  height: 98px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 15px,
+    #ffffff02 15px,
+    #ffffff02 16px
+  );
+  margin: 4px 0 0;
+}
+.avatar {
+  width: 83px;
+  height: 83px;
+  filter: drop-shadow(0 6px 7px #0003);
+  transition: translate 0.25s;
+  position: relative;
+  z-index: 1;
+}
+.model-card:hover .avatar {
+  translate: 0 -4px;
+}
+.pixel-ground {
+  position: absolute;
+  bottom: 12px;
+  left: 24px;
+  right: 24px;
+  border-bottom: 1px solid #ffffff09;
+}
+.card-body {
+  padding: 11px 12px 12px;
+  border-top: 1px solid var(--line);
+}
+.card-body h3 {
+  font-size: 13px;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+.model-id {
+  font:
+    9px/1.7 "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0 0 5px;
+}
+.connection-state {
+  font:
+    8px "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  display: inline-block;
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.selected .connection-state {
+  color: var(--accent);
+  border-color: #d9a05240;
+}
+.card-buttons {
+  display: flex;
+  gap: 5px;
+  margin-top: 12px;
+}
+.card-buttons button {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  font-size: 9px;
+  color: var(--text);
+  border-radius: 3px;
+  min-height: 29px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+}
+.card-buttons button:first-child {
+  flex: 1;
+}
+.selected .card-buttons button:first-child {
+  background: var(--accent);
+  color: #171a1c;
+  border-color: var(--accent);
+}
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 252px;
+  gap: 18px;
+  align-items: start;
+  padding-bottom: 8px;
+}
+.chat-workspace {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 5px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 580px;
+  overflow: hidden;
+}
+.workspace-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 19px;
+  border-bottom: 1px solid var(--line);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.workspace-title > span:last-child {
+  font:
+    7px "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.chat {
+  background-image: radial-gradient(#ffffff0b 0.7px, transparent 0.7px);
+  padding: 0 22px;
+  min-height: 0;
+  flex: 1;
+}
+.welcome {
+  padding: 24px 0 20px;
+  max-width: 560px;
+}
+.welcome-art {
+  height: 64px;
+  width: 90px;
+  transform: none;
+  margin: 0;
+}
+.friend-stage {
+  left: 18px;
+  top: 0;
+  transform: none;
+}
+.friend-stage .pixel-friend {
+  width: 52px;
+  height: 52px;
+  color: var(--accent);
+}
+.eyebrow {
+  font-size: 7px;
+  letter-spacing: 1.5px;
+  margin: 7px 0 12px;
+}
+.welcome h1 {
+  font:
+    26px "Pixelify Sans",
+    monospace;
+  letter-spacing: 0;
+}
+.welcome p {
+  font-size: 11px;
+  line-height: 1.8;
+  margin: 10px 0;
+}
+.quest-label {
+  margin: 19px 0 10px;
+  font-size: 7px;
+}
+.quests {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.quest {
+  padding: 10px;
+  background: var(--bg);
+  box-shadow: none;
+}
+.quest-top {
+  margin-bottom: 9px;
+}
+.quest-top svg {
+  width: 14px;
+  height: 14px;
+}
+.quest strong {
+  font-size: 10px;
+}
+.quest > span:last-child {
+  font-size: 9px;
+}
+.composer-wrap {
+  width: 100%;
+  background: var(--panel);
+  padding: 13px 16px 14px;
+}
+.composer-shell {
+  border-color: #3a3e40;
+  background: var(--bg);
+  box-shadow: 0 2px 5px #0001;
+}
+.composer {
+  background: var(--bg);
+  padding: 12px;
+  border-radius: 5px;
+}
+.composer textarea {
+  font-size: 12px;
+  min-height: 34px;
+}
+.composer-toolbar > span {
+  font-size: 8px;
+}
+.send {
+  background: var(--accent);
+  color: #171a1c;
+  box-shadow: 0 2px 0 #8c6b3e;
+  border-color: var(--accent);
+}
+.hint {
+  font-size: 8px;
+}
+.hint kbd {
+  font-size: 8px;
+}
+.messages:not(:empty) {
+  padding: 22px 0;
+}
+.message {
+  font-size: 13px;
+}
+.message.assistant:before {
+  font-size: 8px;
+}
+.workspace-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.workspace-info details {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 5px;
+  padding: 0 15px 13px;
+  min-width: 0;
+}
+.workspace-info summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  padding: 15px 0;
+  cursor: pointer;
+  list-style: none;
+}
+.workspace-info summary > span {
+  margin-left: auto;
+  color: var(--muted);
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+}
+.workspace-info summary svg {
+  color: var(--accent);
+  width: 13px;
+}
+.panel-caption {
+  font-size: 10px;
+  color: var(--muted);
+  margin: 0 0 9px;
+}
+.connection-row {
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 12px 0;
+  width: 100%;
+  text-align: left;
+}
+.connection-row > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.connection-row strong {
+  font-size: 10px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 400;
+}
+.connection-row small {
+  font-size: 9px;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+.connection-row svg {
+  color: var(--muted);
+}
+.panel-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--panel2);
+  font-size: 9px;
+  padding: 9px;
+  color: var(--muted);
+  margin-top: 7px;
+}
+.model-detail {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 7px;
+  border-top: 1px solid var(--line);
+  padding: 12px 0;
+}
+.model-detail .avatar {
+  width: 46px;
+  height: 46px;
+}
+.model-detail strong {
+  font-size: 11px;
+  font-weight: 500;
+}
+.model-detail code {
+  font:
+    9px/1.5 "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+  text-align: center;
+  max-width: 100%;
+}
+.workspace-info dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  font-size: 9px;
+  border-top: 1px solid var(--line);
+  padding: 13px 0 2px;
+  margin: 0;
+}
+.workspace-info dt {
+  color: var(--muted);
+}
+.workspace-info dd {
+  margin: 0;
+}
+.start-chat {
+  width: 100%;
+  background: var(--accent-soft);
+  border: 1px solid #d9a05240;
+  color: var(--accent);
+  border-radius: 3px;
+  font-size: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 11px;
+  margin-top: 8px;
+}
+.privacy-note {
+  display: flex;
+  gap: 10px;
+  padding: 4px 8px;
+  color: var(--muted);
+}
+.privacy-note svg {
+  color: #8faf85;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.privacy-note p {
+  font-size: 10px;
+  line-height: 1.6;
+  margin: 0;
+}
+.privacy-note p span {
+  font-size: 9px;
+  color: var(--muted);
+}
+.main-footer {
+  padding: 20px 0;
+}
+.sheet {
+  background: var(--panel);
+  border-color: #41413b;
+  box-shadow: 0 20px 100px #0008;
+}
+.sheet h2 {
+  font-size: 28px;
+}
+.primary {
+  background: var(--accent);
+  color: #171a1c;
+  box-shadow: 0 2px 0 #8c6b3e;
+}
+.test-consent {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 12px 0;
+}
+.test-consent input {
+  accent-color: var(--accent);
+}
+.field-row {
+  grid-template-columns: 1fr;
+}
+.model-state.error {
+  color: #e39a85;
+}
+.model-state.success {
+  color: #8faf85;
+}
+.status {
+  color: var(--accent);
+  overflow-wrap: anywhere;
+}
+.thinking-card {
+  background: var(--bg);
+}
+.quick-help {
+  bottom: 45px;
+}
+.sidebar-collapsed .app {
+  grid-template-columns: 65px minmax(0, 1fr);
+}
+.sidebar-collapsed .side {
+  padding-left: 13px;
+  padding-right: 13px;
+}
+.sidebar-collapsed .side > *:not(.brand):not(.collapse-sidebar) {
+  display: none;
+}
+.sidebar-collapsed .brand {
+  font-size: 0;
+  gap: 0;
+}
+.sidebar-collapsed .brand-dot {
+  display: none;
+}
+.sidebar-collapsed .collapse-sidebar {
+  right: -12px;
+}
+.sidebar-collapsed .brand-icon {
+  width: 36px;
+}
+.website-preview {
+  background: var(--panel);
+}
+.preview-open .workspace-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+.preview-open .workspace-info {
+  display: none;
+}
+.preview-open .dashboard-intro .local-badge {
+  display: none;
+}
+.preview-open .dashboard-scroll {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.preview-open .connection-badge {
+  display: none;
+}
+@keyframes selection-glow {
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (min-width: 1600px) {
+  .dashboard-scroll {
+    padding: 0 45px;
+  }
+  .model-card {
+    flex-basis: 195px;
+  }
+  .chat-workspace {
+    height: 620px;
+  }
+}
+@media (max-width: 1150px) {
+  .workspace-grid {
+    grid-template-columns: minmax(0, 1fr) 210px;
+  }
+  .app {
+    grid-template-columns: 190px minmax(0, 1fr);
+  }
+  .brand {
+    font-size: 20px;
+  }
+  .dashboard-scroll {
+    padding: 0 20px;
+  }
+  .connection-badge > span {
+    display: none;
+  }
+  .local-badge {
+    display: none;
+  }
+  .hint > span:last-child {
+    display: none;
+  }
+}
+@media (max-width: 900px) {
+  .workspace-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .workspace-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .privacy-note {
+    display: none;
+  }
+  .chat-workspace {
+    height: 600px;
+  }
+  .connection-badge {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  .app,
+  .sidebar-collapsed .app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side,
+  .sidebar-collapsed .side {
+    position: fixed;
+    width: 260px;
+    padding: 25px 18px;
+    z-index: 41;
+  }
+  .sidebar-collapsed .side > *:not(.brand):not(.collapse-sidebar) {
+    display: revert;
+  }
+  .sidebar-collapsed .brand {
+    font-size: 23px;
+    gap: 8px;
+  }
+  .collapse-sidebar {
+    display: none;
+  }
+  .top {
+    flex-basis: 65px;
+    padding: 0 14px;
+  }
+  .dashboard-scroll {
+    padding: 0 14px;
+  }
+  .dashboard {
+    padding: 20px 0 12px;
+  }
+  .dashboard-intro h1 {
+    font-size: 31px;
+  }
+  .dashboard-intro p {
+    font-size: 10px;
+    max-width: 300px;
+  }
+  .section-title {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  .section-title h2 {
+    font-size: 11px;
+  }
+  .model-card {
+    flex-basis: 150px;
+  }
+  .card-top {
+    font-size: 6px;
+  }
+  .avatar-scene {
+    height: 65px;
+  }
+  .avatar-scene .avatar {
+    width: 60px;
+    height: 60px;
+  }
+  .card-body {
+    padding: 9px;
+  }
+  .card-body h3 {
+    font-size: 11px;
+  }
+  .card-buttons button {
+    min-height: 36px;
+  }
+  .model-id {
+    font-size: 8px;
+  }
+  .card-buttons {
+    margin-top: 9px;
+  }
+  .workspace-grid {
+    gap: 12px;
+  }
+  .chat-workspace {
+    height: 570px;
+  }
+  .workspace-title {
+    padding: 13px;
+  }
+  .chat {
+    padding: 0 15px;
+  }
+  .welcome {
+    padding: 15px 0;
+    flex-shrink: 0;
+  }
+  .welcome h1 {
+    font-size: 24px;
+  }
+  .welcome p {
+    font-size: 10px;
+  }
+  .quest-label {
+    margin-top: 15px;
+  }
+  .welcome-art {
+    height: 44px;
+  }
+  .friend-stage .pixel-friend {
+    width: 38px;
+    height: 38px;
+  }
+  .eyebrow {
+    font-size: 6px;
+  }
+  .quest {
+    padding: 9px;
+  }
+  .quest strong {
+    font-size: 10px;
+  }
+  .quest > span:last-child {
+    font-size: 8px;
+  }
+  .composer-wrap {
+    padding: 10px 12px;
+  }
+  .workspace-info {
+    grid-template-columns: 1fr;
+  }
+  .workspace-info details:not([open]) {
+    padding-bottom: 0;
+  }
+  .panel-action,
+  .start-chat,
+  .connection-row {
+    min-height: 42px;
+  }
+  .main-footer {
+    padding: 14px 0;
+  }
+  .section-title button {
+    width: 30px;
+    height: 30px;
+  }
+  .top-actions .iconbtn {
+    width: 34px;
+    height: 40px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-scroll {
+    scroll-behavior: auto;
+  }
+  .model-card:hover .avatar {
+    translate: none;
+  }
+  .model-card.selected:after {
+    animation: none;
+  }
+}
+.history:empty {
+  flex: 0;
+}
+.empty-history {
+  margin-bottom: auto;
+}
+.suggested-label {
+  display: block;
+  font-size: 7px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.profile-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--accent);
+}
+.local-profile {
+  position: relative;
+}
+.profile-popover {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  z-index: 25;
+  width: 250px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 18px;
+  box-shadow: 0 10px 40px #0006;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.profile-popover p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.profile-popover button {
+  border: 1px solid var(--line);
+  background: var(--panel2);
+  padding: 8px;
+  font-size: 10px;
+  color: var(--accent);
+  border-radius: 3px;
+}
+.modelpick {
+  max-width: min(30vw, 300px);
+}
+@media (min-width: 901px) and (max-height: 1000px) {
+  .dashboard {
+    padding-top: 20px;
+    padding-bottom: 17px;
+  }
+  .dashboard-intro h1 {
+    font-size: 33px;
+    margin: 5px 0;
+  }
+  .section-title {
+    margin-top: 20px;
+  }
+  .avatar-scene {
+    height: 71px;
+  }
+  .avatar-scene .avatar {
+    width: 67px;
+    height: 67px;
+  }
+  .card-body {
+    padding: 9px 11px;
+  }
+  .card-buttons {
+    margin-top: 9px;
+  }
+  .chat-workspace {
+    height: 490px;
+  }
+  .welcome-art {
+    height: 45px;
+  }
+  .friend-stage .pixel-friend {
+    width: 40px;
+    height: 40px;
+  }
+  .welcome {
+    padding: 14px 0;
+  }
+  .welcome .eyebrow {
+    margin-top: 3px;
+  }
+  .quest-label {
+    margin-top: 11px;
+  }
+  .quest-top {
+    margin-bottom: 5px;
+  }
+  .welcome p {
+    margin-top: 6px;
+  }
+  .quest {
+    padding: 8px;
+  }
+  .workspace-info .model-detail {
+    padding: 8px 0;
+  }
+  .workspace-info .model-detail .avatar {
+    width: 35px;
+    height: 35px;
+  }
+}
+@media (max-width: 760px) {
+  .has-conversation:not(.models-expanded) .dashboard {
+    display: none;
+  }
+  .has-conversation .workspace-grid {
+    padding-top: 12px;
+  }
+  .has-conversation .chat-workspace {
+    height: calc(var(--visual-height, 100dvh) - 94px);
+    min-height: 400px;
+  }
+  .top .modelpick {
+    max-width: calc(100vw - 190px);
+  }
+  .model-control .micro-label {
+    font-size: 6px;
+    letter-spacing: 0.7px;
+  }
+  .suggested-label {
+    font-size: 6px;
+  }
+  .local-profile {
+    margin-left: 3px;
+  }
+}
+.welcome {
+  flex-shrink: 0;
+}
+.card-body h3 {
+  font-size: 14px;
+}
+.model-id {
+  font-size: 10px;
+}
+.connection-state {
+  font-size: 9px;
+}
+.card-buttons button {
+  font-size: 10px;
+}
+.panel-caption {
+  font-size: 11px;
+}
+.connection-row strong {
+  font-size: 11px;
+}
+.connection-row small {
+  font-size: 10px;
+}
+.workspace-info dl {
+  font-size: 10px;
+}
+.panel-action {
+  font-size: 10px;
+}
+.close-sidebar {
+  display: none;
+}
+.suggested-label {
+  font-size: 8px;
+  line-height: 1.5;
+}
+@media (min-width: 901px) and (max-height: 1000px) {
+  .dashboard {
+    padding-top: 17px;
+    padding-bottom: 14px;
+  }
+  .section-title {
+    margin-top: 14px;
+  }
+  .avatar-scene {
+    height: 55px;
+  }
+  .avatar-scene .avatar {
+    width: 52px;
+    height: 52px;
+  }
+  .card-top {
+    padding-top: 9px;
+  }
+  .card-body {
+    padding: 8px 11px;
+  }
+  .card-buttons {
+    margin-top: 7px;
+  }
+  .model-card {
+    flex-basis: 180px;
+  }
+  .model-id {
+    margin-bottom: 4px;
+  }
+  .suggested-label {
+    font-size: 7px;
+  }
+  .chat-workspace {
+    height: 450px;
+  }
+  .welcome-art,
+  .welcome .eyebrow {
+    display: none;
+  }
+  .welcome h1 {
+    font-size: 24px;
+  }
+  .welcome p {
+    font-size: 10px;
+  }
+  .welcome {
+    padding: 18px 0 14px;
+  }
+  .quest-label {
+    margin: 8px 0;
+  }
+  .quest-top {
+    margin-bottom: 4px;
+  }
+  .quest {
+    padding: 8px;
+  }
+  .quest > span:last-child {
+    font-size: 8px;
+  }
+  .quest strong {
+    margin-bottom: 4px;
+  }
+}
+@media (max-width: 760px) {
+  .close-sidebar {
+    position: absolute;
+    top: 20px;
+    right: 12px;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    background: var(--panel2);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    color: var(--muted);
+  }
+  .side .brand {
+    font-size: 21px;
+  }
+  .card-body h3 {
+    font-size: 12px;
+  }
+  .card-buttons button {
+    min-height: 42px;
+    font-size: 10px;
+  }
+  .connection-state {
+    font-size: 9px;
+  }
+  .suggested-label {
+    font-size: 7px;
+  }
+  .model-id {
+    font-size: 9px;
+  }
+  .composer textarea {
+    font-size: 16px;
+  }
+  .field input,
+  .field select {
+    font-size: 16px;
+  }
+  .top .modelpick {
+    font-size: 12px;
+  }
+}
+@media (min-width: 761px) {
+  html.sidebar-collapsed .side > .new,
+  html.sidebar-collapsed .side > .playground-nav {
+    display: flex !important;
+    font-size: 0;
+    padding: 10px;
+    justify-content: center;
+    gap: 0;
+  }
+  html.sidebar-collapsed .side > .side-bottom {
+    display: grid !important;
+  }
+  .sidebar-collapsed .side .navbtn {
+    font-size: 0;
+    justify-content: center;
+    gap: 0;
+    padding: 10px;
+  }
+  .sidebar-collapsed .side .new kbd,
+  .sidebar-collapsed .side .navbtn span,
+  .sidebar-collapsed .side .connection-card,
+  .sidebar-collapsed .sidebar-footer {
+    display: none;
+  }
+  .sidebar-collapsed .side .playground-nav {
+    margin-top: 26px;
+  }
+}
+@media (max-width: 760px) {
+  .side:not(.open) {
+    visibility: hidden;
+  }
+  .side.open {
+    visibility: visible;
+  }
+}

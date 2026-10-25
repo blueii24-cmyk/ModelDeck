@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 test('welcome, prompts, connections, theme and persisted history', async ({page}) => {
  const errors=[]; page.on('pageerror', e=>errors.push(e.message));
  await page.goto('/');
- await expect(page.getByRole('heading',{name:'A little space for big ideas.'})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'Your AI space.'})).toBeVisible();
  await page.getByRole('button',{name:'Build something'}).click();
  await expect(page.getByRole('textbox',{name:'Message ModelDeck'})).toHaveValue(/Help me build/);
  await page.getByRole('button',{name:'Send message'}).click();
