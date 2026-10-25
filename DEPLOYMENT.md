@@ -1,6 +1,6 @@
 # GitHub Pages
 
-ModelDeck is a static single-page app. The GitHub Actions workflow publishes the repository root on pushes to `main`.
+ModelDeck is a static single-page app. The GitHub Actions workflow installs dependencies, builds the React app with Vite, and publishes `dist` on pushes to `main`.
 
 If the first deployment fails because Pages is not enabled yet, open **Settings → Pages**, set **Build and deployment → Source** to **GitHub Actions**, then rerun the workflow under **Actions → Deploy ModelDeck to GitHub Pages**.
 

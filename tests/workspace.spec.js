@@ -1,0 +1,43 @@
+import { test, expect } from '@playwright/test';
+test('welcome, prompts, connections, theme and persisted history', async ({page}) => {
+ const errors=[]; page.on('pageerror', e=>errors.push(e.message));
+ await page.goto('/');
+ await expect(page.getByRole('heading',{name:'A little space for big ideas.'})).toBeVisible();
+ await page.getByRole('button',{name:'Build something'}).click();
+ await expect(page.getByRole('textbox',{name:'Message ModelDeck'})).toHaveValue(/Help me build/);
+ await page.getByRole('button',{name:'Send message'}).click();
+ await expect(page.getByRole('dialog')).toBeVisible();
+ await expect(page.locator('#apiKey')).toHaveAttribute('type','password');
+ await page.getByRole('button',{name:'Done',exact:true}).click();
+ await page.locator('#appearance').click();
+ await page.getByRole('button',{name:'Dark Dim and focused'}).click();
+ await expect(page.locator('html')).toHaveAttribute('data-mode','dark');
+ await page.getByRole('button',{name:'Light Bright and clear'}).click();
+ await page.getByRole('button',{name:'Done',exact:true}).click();
+ await page.locator('#newChat').click();
+ await expect(page.locator('#history button')).toHaveCount(1);
+ await page.reload();
+ await expect(page.locator('#history button')).toHaveCount(1);
+ await page.screenshot({path:'test-results/desktop.png'});
+ expect(errors).toEqual([]);
+});
+test('mobile drawer, quick start and no horizontal overflow', async ({page})=>{
+ await page.setViewportSize({width:390,height:844}); await page.goto('/');
+ await page.getByRole('button',{name:'Open navigation'}).click();
+ await expect(page.locator('#side')).toHaveClass(/open/);
+ await page.locator('#newChat').click();
+ await expect(page.locator('#side')).not.toHaveClass(/open/);
+ await page.getByRole('button',{name:'Quick start'}).click();
+ await expect(page.getByText('Ready, player one?')).toBeVisible();
+ await page.getByRole('button',{name:'Quick start'}).click();
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await page.screenshot({path:'test-results/mobile.png'});
+});
+test('mock provider request renders and saves an answer',async({page})=>{
+ await page.addInitScript(()=>localStorage.setItem('modeldeck-ghpages-v2',JSON.stringify({connections:[{id:'test',name:'Test',provider:'openai',apiKey:'test-only',baseUrl:'https://api.openai.com/v1',model:'gpt-4o-mini',availableModels:[]}],selectedConnectionId:'test',chats:[]})));
+ await page.route('https://api.openai.com/v1/chat/completions', route=>route.fulfill({json:{choices:[{message:{content:'Hello from the test model.'}}]}}));
+ await page.goto('/'); await page.locator('#prompt').fill('Hello'); await page.locator('#send').click();
+ await expect(page.locator('.message.assistant')).toHaveText('Hello from the test model.');
+ await expect(page.locator('#welcome')).toBeHidden();
+ await expect(page.locator('#history button')).toHaveText('Hello');
+});
