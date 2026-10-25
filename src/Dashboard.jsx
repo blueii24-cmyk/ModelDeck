@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Info,
   UserRound,
+  MessageSquare,
 } from "lucide-react";
 export const dashboardAction = (action, extra = {}) =>
   window.dispatchEvent(
@@ -86,9 +87,14 @@ export function Dashboard() {
             Different minds. Endless possibilities. Find your next collaborator.
           </p>
         </div>
-        <span className="local-badge">
-          <ShieldCheck size={14} /> Local-first workspace
-        </span>
+        <div className="dashboard-actions">
+          <span className="local-badge">
+            <ShieldCheck size={14} /> Local-first workspace
+          </span>
+          <button className="dashboard-open-chat" onClick={() => dashboardAction("chat")}>
+            <MessageSquare size={14} /> Open chat <ArrowUpRight size={14} />
+          </button>
+        </div>
       </div>
       <div className="section-title">
         <h2>
