@@ -30,7 +30,81 @@ const savedTheme=parse(read(themeStore),null)||parse(read('modeldeck-theme-v1'),
 function cacheFor(p){return(state.availableModels[p]||[]).map(x=>typeof x==='string'?{id:x,name:x}:x).filter(x=>x&&typeof x.id==='string')}
 function modelLabel(x){return x.name&&x.name!==x.id?x.name+' — '+x.id:x.id}
 function populateHeader(){const sel=$('model'),x=currentConnection(),p=active?.provider||x?.provider||state.provider,current=normalizeId(active?.model||currentModel(p),p),items=x&&x.provider===p?(x.availableModels||[]):cacheFor(p);sel.replaceChildren();if(!items.some(x=>x.id===current)){const opt=document.createElement('option');opt.value=current;opt.textContent=current||'Choose a model';sel.append(opt)}items.forEach(x=>{const opt=document.createElement('option');opt.value=x.id;opt.textContent=modelLabel(x);opt.title=x.id;sel.append(opt)});const manage=document.createElement('option');manage.value='__manage__';manage.textContent='Manage / refresh models…';sel.append(manage);const switcher=document.createElement('option');switcher.value='__connections__';switcher.textContent='Switch API key / connection…';sel.append(switcher);sel.value=current;if(sel.value!==current)sel.selectedIndex=0;sel.title=(providers[p]?.name||p)+' · '+current}
-function render(){const history=$('history');history.replaceChildren();state.chats.forEach(c=>{const b=document.createElement('button');b.type='button';b.textContent=c.title||'New chat';b.title=b.textContent;b.onclick=()=>selectChat(c);history.append(b)});const has=!!(active&&active.messages.length);$('welcome').hidden=has;$('messages').replaceChildren();if(active)active.messages.forEach(m=>{const d=document.createElement('div');d.className='message '+(m.role==='user'?'user':'assistant')+(m.error?' error':'');d.textContent=String(m.content??'');if(m.role==='assistant'&&!m.error&&!m.loading){const source=extractWebsite(String(m.content??''));if(source){const button=document.createElement('button');button.type='button';button.className='website-preview-button';button.textContent='▣ Preview website ↗';button.onclick=()=>window.dispatchEvent(new CustomEvent('modeldeck:preview',{detail:{source}}));d.append(button)}}$('messages').append(d)});populateHeader();requestAnimationFrame(()=>$('chat').scrollTop=has?$('chat').scrollHeight:0)}
+// Retain unchanged message nodes so old replies do not animate or announce again.
+const messageViews = new WeakMap();
+let renderedChat = null;
+const sendIcon = $('send').innerHTML;
+function setBusy(value) {
+  busy = value;
+  $('send').disabled = value;
+  $('send').setAttribute('aria-label', value ? 'Waiting for model response' : 'Send message');
+  $('send').innerHTML = value ? '<span class="send-pulse" aria-hidden="true">···</span>' : sendIcon;
+  document.querySelector('.composer-shell').classList.toggle('is-thinking', value);
+}
+function messageView(message) {
+  const signature = JSON.stringify([message.content, message.loading, message.error]);
+  const cached = messageViews.get(message);
+  if (cached?.signature === signature) return cached.node;
+  const node = document.createElement('div');
+  node.className = 'message ' + (message.role === 'user' ? 'user' : 'assistant') + (message.error ? ' error' : '') + (message.loading ? ' thinking-message' : '');
+  if (message.loading) {
+    // This is a request status, not a representation of private model reasoning.
+    node.innerHTML = '<div class="thinking-card"><span class="thinking-pixel" aria-hidden="true">✳</span><div class="thinking-copy"><strong>Thinking<span class="thinking-dots" aria-hidden="true"><b></b><b></b><b></b></span></strong><span class="thinking-model"></span><small>Waiting for a response. Take a little breather.</small></div></div>';
+    node.querySelector('.thinking-model').textContent = message.model || active?.model || 'Your model';
+    node.setAttribute('role', 'status');
+    node.setAttribute('aria-label', (message.model || active?.model || 'Your model') + ' is thinking. Waiting for a response.');
+  } else {
+    node.textContent = String(message.content ?? '');
+    if (message.role === 'assistant' && !message.error) {
+      const source = extractWebsite(String(message.content ?? ''));
+      if (source) {
+        const button = document.createElement('button');
+        button.type = 'button'; button.className = 'website-preview-button'; button.textContent = '▣ Preview website ↗';
+        button.onclick = () => window.dispatchEvent(new CustomEvent('modeldeck:preview', {detail:{source}}));
+        node.append(button);
+      }
+    }
+  }
+  messageViews.set(message, {signature, node});
+  return node;
+}
+function render() {
+  const history = $('history'); history.replaceChildren();
+  state.chats.forEach(c => {
+    const button = document.createElement('button'); button.type = 'button';
+    button.textContent = c.title || 'New chat'; button.title = button.textContent;
+    button.setAttribute('aria-current', String(c === active));
+    button.onclick = () => selectChat(c); history.append(button);
+  });
+  const has = !!active?.messages.length;
+  const switched = renderedChat !== active;
+  const scroller = $('chat');
+  const nearBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 100;
+  $('welcome').hidden = has;
+  const messages = $('messages');
+  if (switched) messages.replaceChildren();
+  const pendingHere = !!active?.messages.some(message => message.loading);
+  document.querySelector('.model-area').classList.toggle('is-thinking', pendingHere);
+  const hint = $('composerHint');
+  if (hint) hint.textContent = busy ? (pendingHere ? 'Your model is thinking…' : 'A reply is still pending in another chat…') : 'A good idea starts with a hello.';
+  (active?.messages || []).forEach((message, index) => {
+    const node = messageView(message);
+    const existing = messages.children[index];
+    if (existing !== node) {
+      if (existing) existing.replaceWith(node);
+      else messages.append(node);
+    }
+  });
+  while (messages.children.length > (active?.messages.length || 0)) messages.lastChild.remove();
+  renderedChat = active;
+  populateHeader();
+  // Do not pull readers away from an older reply when a request finishes.
+  if (switched || nearBottom || pendingHere) requestAnimationFrame(() => scroller.scrollTo({
+    top: has ? scroller.scrollHeight : 0,
+    behavior: switched || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+  }));
+}
+
 function closeSide(){$('side').classList.remove('open');$('drawerShade').classList.remove('open')}
 function newChat(){window.dispatchEvent(new Event('modeldeck:conversation'));const x=currentConnection();active={id:Date.now().toString(36)+Math.random().toString(36).slice(2,7),title:'New chat',connectionId:x.id,provider:x.provider,model:currentModel(x.provider),messages:[]};state.chats.unshift(active);persist();render();closeSide();$('prompt').focus({preventScroll:true})}
 function selectChat(c){window.dispatchEvent(new Event('modeldeck:conversation'));active=c;const x=state.connections.find(y=>y.id===c.connectionId)||state.connections.find(y=>y.provider===c.provider)||state.connections[0];if(x){c.connectionId=x.id;syncConnection(x)}if(!providers[c.provider])c.provider=state.provider;if(c.model)state.models[c.provider]=normalizeId(c.model,c.provider);if(!c.model)c.model=currentModel(c.provider);persist();render();closeSide()}
@@ -61,7 +135,7 @@ if(kind==='models'){const manual=$('modelId').value.trim(),selected=$('modelList
 $('settings').onclick=e=>{if(e.target===$('settings'))closeSettings()};$('newChat').onclick=newChat;$('clear').onclick=()=>{if(confirm('Clear all saved chats from this browser?')){state.chats=[];active=null;window.dispatchEvent(new Event('modeldeck:conversation'));persist();render();closeSide();notice('Chat history cleared.')}};$('menu').onclick=()=>{const isOpen=!$('side').classList.contains('open');$('side').classList.toggle('open',isOpen);$('drawerShade').classList.toggle('open',isOpen)};$('drawerShade').onclick=closeSide;
 document.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>{$('prompt').value=b.dataset.prompt;$('prompt').focus();resize()});function resize(){$('prompt').style.height='auto';$('prompt').style.height=Math.min($('prompt').scrollHeight,180)+'px'}$('prompt').addEventListener('input',resize);$('prompt').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();$('form').requestSubmit()}});
 function responseText(d,p){if(p==='gemini')return d.candidates?.[0]?.content?.parts?.map(x=>x.text||'').join('\n').trim()||'';if(p==='anthropic')return d.content?.filter(x=>x.type==='text'||x.text).map(x=>x.text||'').join('\n').trim()||'';const x=d.choices?.[0]?.message?.content;if(typeof x==='string')return x;if(Array.isArray(x))return x.map(y=>typeof y==='string'?y:(y.text||'')).join('\n').trim();return x&&typeof x==='object'?JSON.stringify(x):''}
-async function send(raw){const text=String(raw||'').trim();if(!text||busy)return;const conn=state.connections.find(x=>x.id===(active?.connectionId||state.selectedConnectionId))||currentConnection();if(conn)syncConnection(conn);const p=active?.provider||conn?.provider||state.provider,m=normalizeId(active?.model||conn?.model||currentModel(p),p),key=String(conn&&conn.provider===p?conn.apiKey:state.keys[p]||'').trim();if(!key&&p!=='omniroute'){openSettings('connections');$('sheetSub').textContent='Add an API key to chat with '+(providers[p]?.name||p)+'.';return}if(!baseUrl(p,conn)){openSettings('connections');$('sheetSub').textContent='Add the API base URL for this provider.';return}if(!m){openSettings('models');return}let url;try{url=endpoint(p,'chat',m,conn)}catch(e){openSettings('connections');notice(e.message);return}if(!active)newChat();const chat=active;chat.provider=p;chat.connectionId=conn?.id||state.selectedConnectionId;chat.model=m;chat.messages.push({role:'user',content:text});if(!chat.title||chat.title==='New chat')chat.title=text.replace(/\s+/g,' ').slice(0,38);const loading={role:'assistant',content:'Thinking…',loading:true};chat.messages.push(loading);busy=true;$('send').disabled=true;$('send').textContent='…';$('prompt').value='';resize();notice('');persist();render();const messages=()=>chat.messages.filter(x=>x!==loading&&!x.loading&&!x.error).map(x=>({role:x.role,content:x.content}));try{let requestUrl=url,headers=headersFor(p,key),body;if(p==='gemini'){requestUrl+=(requestUrl.includes('?')?'&':'?')+'key='+encodeURIComponent(key);body={contents:messages().map(x=>({role:x.role==='assistant'?'model':'user',parts:[{text:x.content}]}))}}else if(p==='anthropic'){body={model:m,max_tokens:2048,messages:messages()}}else{body={model:m,messages:messages()}}const data=await requestJson(requestUrl,{method:'POST',headers,body:JSON.stringify(body)},90000),answer=responseText(data,p);if(!answer)throw Error('The provider returned an empty response. Check the selected model and try again.');loading.content=answer;delete loading.loading}catch(e){loading.error=true;loading.content=(e.message||'Unknown network error')+'\n\nCheck the API URL, key, selected model, account quota, internet connection, and browser CORS permissions.';delete loading.loading}finally{busy=false;$('send').disabled=false;$('send').textContent='↑';persist();render();$('prompt').focus({preventScroll:true})}}
+async function send(raw){const text=String(raw||'').trim();if(!text||busy)return;const conn=state.connections.find(x=>x.id===(active?.connectionId||state.selectedConnectionId))||currentConnection();if(conn)syncConnection(conn);const p=active?.provider||conn?.provider||state.provider,m=normalizeId(active?.model||conn?.model||currentModel(p),p),key=String(conn&&conn.provider===p?conn.apiKey:state.keys[p]||'').trim();if(!key&&p!=='omniroute'){openSettings('connections');$('sheetSub').textContent='Add an API key to chat with '+(providers[p]?.name||p)+'.';return}if(!baseUrl(p,conn)){openSettings('connections');$('sheetSub').textContent='Add the API base URL for this provider.';return}if(!m){openSettings('models');return}let url;try{url=endpoint(p,'chat',m,conn)}catch(e){openSettings('connections');notice(e.message);return}if(!active)newChat();const chat=active;chat.provider=p;chat.connectionId=conn?.id||state.selectedConnectionId;chat.model=m;chat.messages.push({role:'user',content:text});if(!chat.title||chat.title==='New chat')chat.title=text.replace(/\s+/g,' ').slice(0,38);const loading={role:'assistant',content:'Thinking…',loading:true,model:m};chat.messages.push(loading);setBusy(true);$('prompt').value='';resize();notice('');persist();render();const messages=()=>chat.messages.filter(x=>x!==loading&&!x.loading&&!x.error).map(x=>({role:x.role,content:x.content}));try{let requestUrl=url,headers=headersFor(p,key),body;if(p==='gemini'){requestUrl+=(requestUrl.includes('?')?'&':'?')+'key='+encodeURIComponent(key);body={contents:messages().map(x=>({role:x.role==='assistant'?'model':'user',parts:[{text:x.content}]}))}}else if(p==='anthropic'){body={model:m,max_tokens:2048,messages:messages()}}else{body={model:m,messages:messages()}}const data=await requestJson(requestUrl,{method:'POST',headers,body:JSON.stringify(body)},90000),answer=responseText(data,p);if(!answer)throw Error('The provider returned an empty response. Check the selected model and try again.');loading.content=answer;delete loading.loading}catch(e){loading.error=true;loading.content=(e.message||'Unknown network error')+'\n\nCheck the API URL, key, selected model, account quota, internet connection, and browser CORS permissions.';delete loading.loading}finally{setBusy(false);persist();render();if(active===chat&&!$('settings').classList.contains('open')&&!document.documentElement.classList.contains('preview-open'))$('prompt').focus({preventScroll:true})}}
 $('form').addEventListener('submit',e=>{e.preventDefault();send($('prompt').value)});
 function syncViewport(){document.documentElement.style.setProperty('--visual-height',Math.round(window.visualViewport?.height||window.innerHeight)+'px')}syncViewport();window.visualViewport?.addEventListener('resize',syncViewport);window.addEventListener('resize',syncViewport);document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('settings').classList.contains('open'))closeSettings();closeSide()}if(e.key==='Tab'&&$('settings').classList.contains('open')){const nodes=[...$('settings').querySelectorAll('button,input,select,[tabindex]')].filter(el=>!el.disabled&&el.offsetParent!==null);const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}}});
 if(state.chats.length){active=state.chats[0];if(!active.provider)active.provider=state.provider;if(!active.model)active.model=currentModel();if(providers[active.provider])state.provider=active.provider}render();if(storageWarning)notice('Browser storage is unavailable. Some changes may not persist.');
