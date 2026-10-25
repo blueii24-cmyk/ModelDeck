@@ -1700,3 +1700,124 @@ html.view-chat .composer-model-picker .model-picker-popup-above {
     transition: none;
   }
 }
+
+
+/* Mobile-first chat composer: a clean ChatGPT/Claude blend with a compact model chip. */
+html.view-chat .composer-shell {
+  border-radius: 14px;
+  border-color: color-mix(in srgb, var(--line) 84%, var(--text) 16%);
+  background: var(--panel);
+  box-shadow: 0 3px 12px #0000000d;
+}
+html.view-chat .composer {
+  border-radius: 14px;
+  padding: 13px 14px 10px;
+  background: transparent;
+}
+html.view-chat .composer textarea {
+  min-height: 54px;
+  line-height: 1.55;
+  padding: 2px 0 12px;
+  font-size: 14px;
+}
+html.view-chat .composer-toolbar {
+  width: 100%;
+  min-width: 0;
+  gap: 8px;
+}
+html.view-chat .composer-actions {
+  margin-left: auto;
+}
+html.view-chat .composer-model-picker {
+  flex-shrink: 1;
+  min-width: 0;
+}
+html.view-chat .composer-model-picker .model-picker-trigger {
+  border-radius: 999px;
+  box-shadow: none;
+  font-size: 11px;
+  min-width: 0;
+}
+html.view-chat .composer-model-picker .active-model-name {
+  min-width: 0;
+  max-width: 155px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+html.view-chat .composer-actions .send {
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: none;
+}
+html.view-chat .composer-actions .send:disabled {
+  opacity: .62;
+}
+@media (max-width: 430px) {
+  html.view-chat .composer-wrap {
+    padding: 8px 10px max(8px, env(safe-area-inset-bottom));
+  }
+  html.view-chat .composer-shell,
+  html.view-chat .composer {
+    border-radius: 15px;
+  }
+  html.view-chat .composer {
+    padding: 10px 11px 9px;
+  }
+  html.view-chat .composer textarea {
+    min-height: 48px;
+    max-height: 34dvh;
+    font-size: 16px;
+    padding-bottom: 10px;
+  }
+  /* Remove the long helper copy from the tiny toolbar; keep the controls aligned. */
+  html.view-chat .composer-toolbar > span {
+    display: none !important;
+  }
+  html.view-chat .composer-actions {
+    width: 100%;
+    gap: 6px;
+    justify-content: flex-end;
+  }
+  html.view-chat .composer-model-picker {
+    width: auto;
+    max-width: calc(100vw - 82px);
+  }
+  html.view-chat .composer-model-picker .model-picker-trigger {
+    max-width: calc(100vw - 82px);
+    min-height: 34px;
+    padding: 0 10px;
+    gap: 6px;
+  }
+  html.view-chat .composer-model-picker .active-model-name {
+    max-width: min(170px, calc(100vw - 180px));
+  }
+  html.view-chat .composer-model-picker .model-picker-trigger > svg {
+    width: 12px;
+    height: 12px;
+  }
+  html.view-chat .composer-actions .send {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+  }
+}
+@media (max-width: 360px) {
+  html.view-chat .composer-wrap {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+  html.view-chat .composer {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+  html.view-chat .composer-model-picker .active-model-name {
+    max-width: calc(100vw - 205px);
+  }
+  html.view-chat .composer-model-picker .model-picker-trigger {
+    gap: 4px;
+    padding-right: 7px;
+    padding-left: 8px;
+  }
+}

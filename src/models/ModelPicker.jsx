@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, Settings2 } from "lucide-react";
 import { useDeck, dashboardAction } from "../Dashboard";
 import { CapabilityBadges } from "./ModelCapabilities";
+function compactModelName(value) {
+  const id = String(value || "Choose model");
+  const withoutNamespace = id.includes("/") ? id.split("/").filter(Boolean).at(-1) || id : id;
+  return withoutNamespace.length > 25 ? withoutNamespace.slice(0, 22) + "…" : withoutNamespace;
+}
 export function ActiveModelCapabilities() {
   const data = useDeck();
   return <CapabilityBadges model={data?.selected.metadata} compact />;
@@ -87,7 +92,9 @@ export default function ModelPicker({ placement = "header" }) {
       >
         <CapabilityBadges model={data?.selected.metadata} compact />
         <span id="activeModelName" className="active-model-name">
-          {data?.selected.model || "Choose a model"}
+          {placement === "composer"
+            ? compactModelName(data?.selected.model)
+            : data?.selected.model || "Choose a model"}
         </span>
         <ChevronDown size={13} />
       </button>

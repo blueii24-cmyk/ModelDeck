@@ -46,3 +46,27 @@ test('mock provider request renders and saves an answer',async({page})=>{
  await expect(page.locator('#welcome')).toBeHidden();
  await expect(page.locator('#history button')).toHaveText('Hello');
 });
+
+
+test('compact composer model selector fits narrow Android viewports', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 800 });
+  await page.goto('/');
+  const picker = page.locator('.composer-actions .rich-model-picker');
+  const trigger = picker.getByRole('button', { name: 'Switch model', exact: true });
+  const send = page.getByRole('button', { name: 'Send message' });
+  await expect(picker).toBeVisible();
+  await expect(trigger).toBeVisible();
+  await expect(send).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const triggerBox = await trigger.boundingBox();
+  const sendBox = await send.boundingBox();
+  expect(triggerBox).not.toBeNull();
+  expect(sendBox).not.toBeNull();
+  expect(triggerBox.x + triggerBox.width).toBeLessThanOrEqual(sendBox.x + 1);
+  await trigger.click();
+  await expect(page.getByRole('listbox', { name: 'Saved models' })).toBeVisible();
+  const popupBox = await page.locator('.composer-model-picker .model-picker-popup').boundingBox();
+  expect(popupBox).not.toBeNull();
+  expect(popupBox.x).toBeGreaterThanOrEqual(0);
+  expect(popupBox.x + popupBox.width).toBeLessThanOrEqual(360);
+});
