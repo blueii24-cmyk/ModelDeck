@@ -1821,3 +1821,53 @@ html.view-chat .composer-actions .send:disabled {
     padding-left: 8px;
   }
 }
+
+
+/* Desktop chat should use the whole canvas; only the transcript stays comfortably readable. */
+html.view-chat .dashboard-scroll,
+html.view-chat .workspace-grid,
+html.view-chat .chat-workspace {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+}
+html.view-chat .chat {
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  margin: 0;
+  padding: 0 clamp(24px, 3vw, 52px);
+}
+html.view-chat .messages {
+  width: min(1180px, 100%);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+html.view-chat .composer-wrap {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 12px clamp(24px, 3vw, 52px) max(12px, env(safe-area-inset-bottom));
+}
+@media (min-width: 1600px) {
+  html.view-chat .chat {
+    padding-right: clamp(42px, 3vw, 58px);
+    padding-left: clamp(42px, 3vw, 58px);
+  }
+  html.view-chat .messages {
+    width: min(1280px, 100%);
+    max-width: 1280px;
+  }
+}
+@media (max-width: 760px) {
+  html.view-chat .chat {
+    padding: 0 16px;
+  }
+  html.view-chat .messages {
+    width: 100%;
+    max-width: none;
+  }
+  html.view-chat .composer-wrap {
+    padding: 10px 12px max(10px, env(safe-area-inset-bottom));
+  }
+}

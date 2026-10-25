@@ -70,3 +70,21 @@ test('compact composer model selector fits narrow Android viewports', async ({ p
   expect(popupBox.x).toBeGreaterThanOrEqual(0);
   expect(popupBox.x + popupBox.width).toBeLessThanOrEqual(360);
 });
+
+
+test('desktop chat and composer use the available width', async ({ page }) => {
+  await page.setViewportSize({ width: 1769, height: 840 });
+  await page.goto('/');
+  const main = await page.locator('main.main').boundingBox();
+  const chat = await page.locator('#chat').boundingBox();
+  const messages = await page.locator('.messages').boundingBox();
+  const composer = await page.locator('.composer-wrap').boundingBox();
+  expect(main).not.toBeNull();
+  expect(chat).not.toBeNull();
+  expect(messages).not.toBeNull();
+  expect(composer).not.toBeNull();
+  expect(chat.width).toBeGreaterThan(main.width * 0.9);
+  expect(composer.width).toBeGreaterThan(main.width * 0.9);
+  expect(messages.width).toBeGreaterThan(main.width * 0.65);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
