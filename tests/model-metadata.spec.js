@@ -46,7 +46,12 @@ test("pricing accepts only trustworthy zero token costs and no other advertised 
     expect(
       pricingFor(p, { pricing: { prompt: 0, completion: 0 }, free: true }),
     ).toBe("unknown");
-  expect(pricingFor("openrouter", { id: "model:free" })).toBe("unknown");
+  expect(pricingFor("openrouter", { id: "model:free" })).toBe("free");
+  expect(pricingFor("openrouter", { id: "openrouter/free" })).toBe("free");
+  expect(pricingFor("openrouter", { id: "model:free", pricing: { prompt: "0.1", completion: "0" } })).toBe("paid");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [] } })).toBe("free");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [{ min_prompt_tokens: 1000, prompt: "0", completion: "0" }] } })).toBe("free");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [{ min_prompt_tokens: 1000, prompt: "0.1", completion: "0" }] } })).toBe("paid");
 });
 test("capabilities keep input/output and embeddings separate, with neutral unknowns", () => {
   const vision = normalizeModel("openrouter", {
@@ -163,7 +168,7 @@ test("malformed entries, conflicting duplicates, and older saved models degrade 
   ).toHaveLength(3);
   expect(
     describeModel("openrouter", { id: "looks:free", free: true }).pricingStatus,
-  ).toBe("unknown");
+  ).toBe("free");
 });
 
 const catalog = [
@@ -235,10 +240,12 @@ test("free-only import is reversible, persisted and never deletes saved or manua
   await page.getByLabel("Free models only", { exact: true }).check();
   await page.locator("#refreshModels").click();
   await expect(page.locator("#modelState")).toContainText(
-    "Imported 1 matching models",
+    "Imported 2 matching models",
   );
-  await expect(page.locator(".catalog-row")).toHaveCount(1);
-  await expect(page.locator(".catalog-row .free-badge")).toHaveText("FREE");
+  await expect(page.locator(".catalog-row")).toHaveCount(2);
+  await expect(page.locator(".catalog-row .free-badge")).toHaveCount(2);
+  await expect(page.locator(".catalog-row .free-badge").first()).toHaveText("FREE");
+  await expect(page.locator(".catalog-row .free-badge").last()).toHaveText("FREE");
   await expect(page.locator("#modelId")).toHaveValue("manual-model");
   await expect(page.locator("#pricingNotice")).toContainText("Quotas");
   await page.getByLabel("Free models only", { exact: true }).uncheck();
@@ -249,7 +256,7 @@ test("free-only import is reversible, persisted and never deletes saved or manua
     "Imported 5 matching models",
   );
   await page.getByLabel("Free models only", { exact: true }).check();
-  await expect(page.locator(".catalog-row")).toHaveCount(1);
+  await expect(page.locator(".catalog-row")).toHaveCount(2);
   await page.locator("#close").click();
   await page.getByRole("button", { name: "Switch model", exact: true }).click();
   await expect(
@@ -428,7 +435,7 @@ test("connection configuration applies free-only before automatic import and pre
   await page.locator("#connectionFreeOnly").check();
   await page.locator("#save").click();
   await expect(page.locator("#status")).toContainText(
-    "Imported 1 matching models",
+    "Imported 2 matching models",
   );
   await page.getByRole("button", { name: "Switch model", exact: true }).click();
   await expect(page.getByRole("option", { name: /Vision Zero/ })).toBeVisible();
@@ -512,9 +519,10 @@ test("refreshing changed prices removes stale FREE badges without deleting saved
   );
   await page.locator("#refreshModels").click();
   await expect(page.locator("#modelState")).toContainText(
-    "Imported 0 matching models",
+    "Imported 1 matching models",
   );
-  await expect(page.locator(".catalog-row")).toHaveCount(0);
+  await expect(page.locator(".catalog-row")).toHaveCount(1);
+  await expect(page.locator(".catalog-row").first()).toContainText("sounding:free");
   await page.locator("#close").click();
   await page.getByRole("button", { name: "Switch model", exact: true }).click();
   const saved = page.getByRole("option", { name: /Vision Zero/ });

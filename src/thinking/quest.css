@@ -550,3 +550,227 @@
   white-space: nowrap;
   pointer-events: none;
 }
+
+
+/* Compact Claude/Kilo-style activity indicator: keep the workshop animation out of chat. */
+.message.thinking-message .quest-world,
+.message.assistant.error .quest-world {
+  width: fit-content;
+  max-width: min(100%, 440px);
+  padding: 7px 10px;
+  border: 0;
+  border-top: 0;
+  border-radius: 7px;
+  box-shadow: none;
+  background: transparent;
+}
+.message.thinking-message .quest-hud,
+.message.assistant.error .quest-hud {
+  justify-content: flex-start;
+  gap: 9px;
+}
+.message.thinking-message .quest-hud strong,
+.message.assistant.error .quest-hud strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font: 500 12px/1.5 "IBM Plex Mono", monospace;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.message.thinking-message .quest-hud strong::before {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border: 1.5px solid var(--line);
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+  border-radius: 50%;
+  animation: quest-minimal-spin 0.8s linear infinite;
+}
+.message.thinking-message .quest-toggle,
+.message.assistant.error .quest-toggle,
+.message.thinking-message .quest-model-line,
+.message.assistant.error .quest-model-line,
+.message.thinking-message .quest-scene-wrap,
+.message.assistant.error .quest-scene-wrap,
+.message.thinking-message .quest-mini,
+.message.assistant.error .quest-mini,
+.message.thinking-message .quest-log,
+.message.assistant.error .quest-log {
+  display: none !important;
+}
+.message.thinking-message .quest-caption,
+.message.assistant.error .quest-caption {
+  margin: 2px 0 0 17px;
+  color: var(--muted);
+  font: 11px/1.45 "IBM Plex Mono", monospace;
+}
+.message.thinking-message .quest-caption {
+  opacity: 0.82;
+}
+.message.assistant.error .quest-world {
+  padding-left: 0;
+  color: var(--world-danger);
+}
+.message.assistant.error .quest-hud strong {
+  color: var(--world-danger);
+}
+.message.assistant.error .quest-hud strong::before {
+  content: "!";
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 0;
+  color: var(--world-danger);
+  animation: none;
+}
+.message.assistant.error .quest-error-copy {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+@keyframes quest-minimal-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .message.thinking-message .quest-hud strong::before {
+    animation: none;
+  }
+}
+
+
+/* Compact Claude Code / Kilo Code-inspired request status. No large animated scene. */
+.quest-world.compact-quest,
+.quest-world.compact-quest.thinking-card {
+  width: min(100%, 520px);
+  max-width: 100%;
+  margin: 2px 0 0;
+  padding: 3px 0;
+  display: block;
+  color: var(--text);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  white-space: normal;
+}
+.compact-quest-row {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+}
+.compact-quest-spinner {
+  flex: 0 0 12px;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid var(--line);
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+  border-radius: 50%;
+  animation: compact-quest-spin .85s linear infinite;
+}
+.compact-quest-spinner[hidden] {
+  display: none;
+}
+.compact-quest-label {
+  min-width: 0;
+  color: var(--muted);
+  font: 12px/1.4 "Space Grotesk", sans-serif;
+  letter-spacing: 0;
+}
+.compact-quest-toggle {
+  margin-left: 2px;
+  padding: 2px 5px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 3px;
+  font: 10px/1.4 "Space Grotesk", sans-serif;
+  opacity: .75;
+}
+.compact-quest-toggle:hover,
+.compact-quest-toggle:focus-visible {
+  color: var(--text);
+  opacity: 1;
+  background: var(--panel2);
+}
+.compact-quest-meta {
+  display: none;
+  padding: 3px 0 5px 20px;
+  min-width: 0;
+  color: var(--muted);
+  font: 9px/1.5 "IBM Plex Mono", monospace;
+  overflow-wrap: anywhere;
+}
+.compact-quest:not(.thinking-card) .compact-quest-spinner {
+  border: 1.5px solid var(--line);
+  animation: none;
+}
+.compact-quest[data-stage="error"] .compact-quest-label {
+  color: #d88977;
+}
+.compact-quest .quest-log {
+  margin: 5px 0 3px 20px;
+  padding: 7px 0 0;
+  border-top: 1px solid var(--line);
+}
+.compact-quest .quest-log small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 9px;
+}
+.compact-quest .quest-log li button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 27px;
+  padding: 4px 6px;
+  font: 10px/1.4 "Space Grotesk", sans-serif;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  text-align: left;
+}
+.compact-quest .quest-log li button[data-state="active"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.compact-quest .quest-log li button[data-state="completed"] .quest-step-icon {
+  color: #8faf85;
+}
+.compact-quest .quest-log li button[data-state="failed"] {
+  color: #d88977;
+}
+.compact-quest .quest-step-name {
+  flex: 1;
+}
+.compact-quest .quest-step-icon,
+.compact-quest .quest-step-state {
+  font: 9px "IBM Plex Mono", monospace;
+}
+.compact-quest .quest-step-state {
+  font-size: 8px;
+}
+.compact-quest .quest-inspection {
+  margin: 6px 0 0;
+  padding: 7px 8px;
+  font: 10px/1.5 "Space Grotesk", sans-serif;
+  color: var(--muted);
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.compact-quest .quest-inspection[hidden] {
+  display: none;
+}
+@keyframes compact-quest-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .compact-quest-spinner { animation: none; }
+}

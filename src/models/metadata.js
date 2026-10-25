@@ -89,22 +89,55 @@ function costs(value) {
     return Number.MIN_VALUE;
   return n;
 }
-export function pricingFor(provider, raw = {}) {
-  if (provider !== "openrouter") return "unknown";
-  const pricing = raw.pricing;
-  if (!pricing || typeof pricing !== "object" || Array.isArray(pricing))
-    return "unknown";
-  const input = costs(pricing.prompt),
-    output = costs(pricing.completion);
-  if (input === null || output === null) return "unknown";
-  if (input > 0 || output > 0) return "paid";
-  // Do not advertise no-cost operation if another advertised charge is nonzero/invalid.
-  for (const [key, value] of Object.entries(pricing)) {
-    if (key === "prompt" || key === "completion") continue;
-    const n = costs(value);
-    if (n === null) return "unknown";
-    if (n > 0) return "paid";
+const pricingControls = new Set(["min_prompt_tokens", "max_prompt_tokens", "utc_days", "utc_start", "utc_end"]);
+function additionalPriceStatus(key, value) {
+  if (pricingControls.has(key)) return "free";
+  if (key === "overrides") {
+    if (!Array.isArray(value)) return "unknown";
+    let unknown = false;
+    for (const override of value) {
+      if (!override || typeof override !== "object" || Array.isArray(override)) return "unknown";
+      for (const [overrideKey, overrideValue] of Object.entries(override)) {
+        const status = additionalPriceStatus(overrideKey, overrideValue);
+        if (status === "paid") return "paid";
+        if (status === "unknown") unknown = true;
+      }
+    }
+    return unknown ? "unknown" : "free";
   }
+  if (value && typeof value === "object") return "unknown";
+  const n = costs(value);
+  if (n === null) return "unknown";
+  return n > 0 ? "paid" : "free";
+}
+
+export function pricingFor(provider, raw = {}) {
+  // Only OpenRouter exposes dependable pricing semantics in this adapter.
+  // Its documented :free variant and openrouter/free router are explicit provider signals.
+  if (provider !== "openrouter") return "unknown";
+  const id = [raw.id, raw.canonical_slug, raw.slug].find(
+    (value) => typeof value === "string",
+  ) || "";
+  const freeVariant = id === "openrouter/free" || /:free$/i.test(id);
+  const pricing = raw.pricing;
+  const input = pricing && typeof pricing === "object" && !Array.isArray(pricing) ? costs(pricing.prompt) : null;
+  const output = pricing && typeof pricing === "object" && !Array.isArray(pricing) ? costs(pricing.completion) : null;
+  if ((input !== null && input > 0) || (output !== null && output > 0)) return "paid";
+
+  let unknownExtra = false;
+  if (pricing && typeof pricing === "object" && !Array.isArray(pricing)) {
+    for (const [key, value] of Object.entries(pricing)) {
+      if (key === "prompt" || key === "completion") continue;
+      const status = additionalPriceStatus(key, value);
+      if (status === "paid") return "paid";
+      if (status === "unknown") unknownExtra = true;
+    }
+  }
+  // A documented OpenRouter free variant stays identifiable even when the API
+  // omits some prices; any explicit positive base/override price wins above.
+  if (freeVariant) return "free";
+  if (!pricing || typeof pricing !== "object" || Array.isArray(pricing)) return "unknown";
+  if (input === null || output === null || unknownExtra) return "unknown";
   return "free";
 }
 export function capabilitiesFor(provider, raw = {}) {
@@ -318,5 +351,5 @@ export function pricingNotice(connection) {
   const count = connection.modelCatalog.filter(
     (m) => m.pricingStatus === "free",
   ).length;
-  return `${count} verified zero-priced model${count === 1 ? "" : "s"} in the latest response. ${connection.freeModelsOnly ? "Paid and unknown-price models are excluded from discovery results, not deleted from saved models. " : ""}Quotas, rate limits, and provider restrictions still apply. Pricing can change; refresh to recheck.`;
+  return `${count} confirmed free model${count === 1 ? "" : "s"} in the latest response (zero-price metadata or an OpenRouter :free variant). ${connection.freeModelsOnly ? "Paid and unknown-price models are excluded from discovery results, not deleted from saved models. " : ""}Quotas, rate limits, and provider restrictions still apply. Refresh to recheck current pricing.`;
 }
