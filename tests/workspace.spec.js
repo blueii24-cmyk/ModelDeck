@@ -99,6 +99,14 @@ test('composer companion idles nearby and reacts when the message box is focused
   await expect(buddy).toBeVisible();
   await expect(buddy).toHaveAttribute('aria-hidden', 'true');
   await expect(thought).toHaveCSS('opacity', '0');
+  const idleStyle = await buddy.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return { animationName: style.animationName, left: style.left, right: style.right, duration: style.animationDuration };
+  });
+  expect(idleStyle.animationName).toBe('buddy-hangout');
+  expect(idleStyle.duration).toBe('2.25s');
+  expect(Number.parseFloat(idleStyle.left)).toBeLessThan(80);
+  expect(idleStyle.right).toBe('auto');
   await prompt.focus();
   await expect(thought).toHaveCSS('opacity', '1');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
