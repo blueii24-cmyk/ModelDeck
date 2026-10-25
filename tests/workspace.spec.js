@@ -90,7 +90,8 @@ test('desktop chat and composer use the available width', async ({ page }) => {
 
 test('chat picker filters to confirmed free models and supports OpenRouter Free Auto', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.addInitScript(() => localStorage.setItem('modeldeck-ghpages-v2', JSON.stringify({
+  await page.addInitScript(() => {
+    if (!localStorage.getItem('modeldeck-ghpages-v2')) localStorage.setItem('modeldeck-ghpages-v2', JSON.stringify({
     connections: [{
       id: 'or-free-test',
       name: 'OpenRouter test',
@@ -108,7 +109,8 @@ test('chat picker filters to confirmed free models and supports OpenRouter Free 
     }],
     selectedConnectionId: 'or-free-test',
     chats: []
-  })));
+  }));
+  });
   await page.goto('/');
   const picker = page.locator('.composer-model-picker');
   await picker.getByRole('button', { name: 'Switch model', exact: true }).click();
