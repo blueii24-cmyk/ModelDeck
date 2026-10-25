@@ -58,9 +58,9 @@ test('reduced motion leaves a readable, static thinking indicator on mobile', as
   await page.emulateMedia({reducedMotion:'reduce'});
   await page.setViewportSize({width:390,height:844});
   const release = await setup(page);
-  expect(await page.locator('.thinking-dots b').first().evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
+  expect(await page.locator('.quest-server-lights path').first().evaluate(el=>getComputedStyle(el).animationName)).toBe('none');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await expect(page.getByRole('status', {name:'gpt-4o-mini is thinking. Waiting for a response.'})).toBeVisible();
+  await expect(page.getByRole('status', {name:'Request progress'})).toBeVisible();
   release(success);
   await expect(page.locator('.thinking-card')).toHaveCount(0);
 });
