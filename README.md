@@ -13,11 +13,11 @@ The deployment workflow runs on every push to `main` and can also be started man
 
 ## Features
 
-- Multiple provider connections: OpenRouter, OpenAI, Google Gemini, Anthropic Claude, Groq, DeepSeek, Together AI, and compatible custom endpoints.
+- Multiple provider connections: OpenRouter, OpenAI, Google Gemini, Anthropic Claude, Groq, DeepSeek, NVIDIA NIM, OmniRoute, and compatible custom endpoints.
 - Model discovery and manual model IDs.
 - Unified chat with saved conversations and model switching.
-- Session-only or browser-persisted API keys.
-- Theme customization: Light, Dark, System, and seven accent themes (Terracotta, Midnight, Emerald, Violet, Rose, Amber, Ocean).
+- Named API-key profiles persisted in this browser (unencrypted).
+- Theme customization: Light, Dark, System, and seven accent themes (Amber, Midnight, Emerald, Violet, Rose, Ochre, Ocean).
 - Responsive interface for desktop and mobile.
 
 ## Run locally
@@ -37,9 +37,11 @@ Some providers may block direct browser requests because of CORS restrictions. A
 
 ## Frontend
 
-The React + Vite interface pairs pixel typography and an original handheld-inspired mascot with a minimal, responsive workspace. Fonts are bundled locally (no font CDN).
+The React + Vite dashboard uses a dark charcoal/amber palette, original pixel avatars, a horizontal provider gallery, and a responsive chat-and-connections workspace. New users default to dark mode; existing appearance preferences are preserved. Fonts are bundled locally (no font CDN).
 
 - `src/main.jsx`: React shell, prompt cards, and quick-start help.
+- `src/Dashboard.jsx`: provider gallery, original pixel avatars, sanitized connection state, profile controls, and collapsible sidebar.
+- `src/dashboard.css`: cohesive dashboard theme and responsive panel layout.
 - `src/workspace.js`: existing chat/provider controller and storage compatibility; initialized once after the shell mounts. Controller-owned history, messages, and settings are isolated from React-updated components.
 - `src/legacy.css`: shared workspace and settings foundations.
 - `src/style.css`: retro theme, layout, and responsive overrides.
@@ -68,3 +70,14 @@ Generated code runs only after opening the preview, in an iframe with `sandbox="
 The interface uses subtle mascot motion, staggered prompt-card arrivals, message transitions, and animated panel entrances. Pending chat requests display a pixel-dot **Thinking** card with the requested model's name, plus composer feedback. This indicates that a request is pending; it does not expose model reasoning or simulate token progress. The indicator clears on success, error, or timeout, and interrupted requests are marked as errors on reload. Switching conversations keeps the pending card with its original chat.
 
 Unchanged message elements are retained to avoid replaying animations and live-region announcements. Completion does not auto-scroll readers away from earlier replies. System **Reduce motion** preferences disable animations and smooth scrolling while preserving readable status text.
+
+## Provider dashboard and connection checks
+
+- Gallery cards show each provider's selected/suggested model ID, not invented availability. Unconfigured provider IDs are explicitly marked as suggestions. Available models come from the selected saved connection's endpoint.
+- Multiple profiles for the same provider are isolated. A late discovery result cannot activate another profile, overwrite its models, or silently change a manually selected model. Editing a provider, key, or endpoint invalidates its old model cache.
+- **Not configured / Not tested** are not connection successes. **Models loaded** only means the listing endpoint responded; it does not prove chat access. **Verified** follows a successful chat or explicit chat probe. Test/discovery failures are shown separately. Verification state is session-local and resets on reload or changed credentials.
+- **Test API key** first attempts model discovery. Optional small chat fallback requires explicit consent and a model ID, because provider charges may apply. Unsupported discovery can always be bypassed with a manually entered model ID.
+- Request errors redact the actual credential (including URL-encoded forms) before display or chat-history storage. Keys remain masked in the form and are excluded from the React dashboard state bridge. Browser devtools still necessarily expose direct provider request credentials to the device owner; this is not a server-side secret vault.
+- Mobile conversations hide the gallery to prioritize chat; **Model playground** reopens it. Connection/model details are collapsible sections. All navigation is in-page, with relative bundled assets for GitHub Pages subpath deployment.
+
+The test suite uses intercepted provider responses, including multiple profiles, Gemini discovery/authentication, Anthropic fallback, credential redaction, and all provider chat formats. It does not claim live provider connectivity or billing validation.
