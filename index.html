@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<meta name="theme-color" content="#f4f5f8" id="themeColor" />
+<title>ModelDeck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="rail" id="rail">
+    <div class="brand"><span class="logo"><i></i><i></i><i></i></span>ModelDeck</div>
+    <button class="btn solid wide" id="newChat">New chat</button>
+    <nav class="chats" id="chatList" aria-label="Chats"></nav>
+    <div class="rail-foot">
+      <button class="link" id="openDeck">Connections <b id="connCount">0</b></button>
+      <button class="link" id="openAppearance">Appearance <span id="themeSummary">Dark · Blue</span></button>
+      <button class="link" id="clearChats">Clear chats</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="bar">
+      <button class="icon menu" id="menuBtn" aria-label="Open chats">☰</button>
+      <div class="picker">
+        <select id="connPick" aria-label="Connection"></select>
+        <select id="modelPick" aria-label="Model"></select>
+        <button class="icon" id="refresh" aria-label="Reload model list" title="Reload model list">↻</button>
+      </div>
+      <button class="btn" id="addKey">Add key</button>
+    </header>
+
+    <section class="stage" id="stage">
+      <div class="hello" id="hello">
+        <h1>Bring your own keys.<br>Talk to any model.</h1>
+        <p>Add a key from OpenRouter, OpenAI, Gemini, Claude, Groq, DeepSeek, Together or any OpenAI-compatible API. Requests go straight from this browser to the provider.</p>
+        <button class="btn solid" id="helloAdd">Add your first key</button>
+        <div class="starters" id="starters">
+          <button data-p="Explain how transformers work, step by step, with one simple analogy.">Explain a hard idea simply</button>
+          <button data-p="Give me 10 small project ideas I can finish this weekend.">Plan a weekend project</button>
+          <button data-p="Review this code for bugs and explain each fix:&#10;&#10;">Review some code</button>
+        </div>
+      </div>
+      <div class="thread" id="thread" hidden></div>
+    </section>
+
+    <form class="composer" id="composer">
+      <textarea id="input" rows="1" placeholder="Add a key to start" aria-label="Message" disabled></textarea>
+      <div class="c-row"><span id="hint">Enter to send, Shift+Enter for a new line</span><button class="send" id="send" type="submit" aria-label="Send" disabled>↑</button></div>
+    </form>
+  </main>
+</div>
+
+<dialog id="deck">
+  <div class="d-head"><h2>Connections</h2><button class="icon" data-close aria-label="Close">×</button></div>
+  <div class="cards" id="cards"></div>
+  <form id="addForm" autocomplete="off">
+    <h3>Add a connection</h3>
+    <label>Provider<select id="fProvider"></select></label>
+    <label id="fUrlWrap" hidden>Base URL<input id="fUrl" type="url" placeholder="https://your-api.example/v1" /></label>
+    <label>API key<input id="fKey" type="password" autocomplete="new-password" required placeholder="Paste your key" /></label>
+    <div class="two">
+      <label>Name (optional)<input id="fName" maxlength="40" placeholder="Work key" /></label>
+      <label>Model ID (optional)<input id="fModel" placeholder="e.g. gpt-4o-mini" /></label>
+    </div>
+    <label class="check"><input type="checkbox" id="fRemember" /> Remember this key on this device</label>
+    <p class="note">Remembered keys sit in this browser's local storage, unencrypted. Without it, the key disappears when you refresh. Chats are saved in this browser either way. Don't use this on a shared computer.</p>
+    <div class="d-actions"><button type="button" class="btn" data-close>Done</button><button class="btn solid" type="submit">Add connection</button></div>
+  </form>
+</dialog>
+
+<dialog id="appearance">
+  <div class="d-head"><div><h2>Appearance</h2><p class="appearance-sub">Make ModelDeck feel like yours.</p></div><button class="icon" data-close-appearance aria-label="Close appearance settings">×</button></div>
+  <section class="setting-group">
+    <h3>Display mode</h3>
+    <div class="mode-grid" role="group" aria-label="Display mode">
+      <button class="mode-option" data-mode="light" aria-pressed="false">Light</button>
+      <button class="mode-option" data-mode="dark" aria-pressed="false">Dark</button>
+      <button class="mode-option" data-mode="system" aria-pressed="false">System</button>
+    </div>
+  </section>
+  <section class="setting-group">
+    <h3>Accent theme</h3>
+    <p class="setting-help">Choose the colour used for buttons, focus states, and highlights.</p>
+    <div class="theme-grid" role="group" aria-label="Accent theme">
+      <button class="theme-option" data-accent="blue"><span class="swatch" style="--swatch:#3478f6"></span><span>Apple Blue</span></button>
+      <button class="theme-option" data-accent="midnight"><span class="swatch" style="--swatch:#727c91"></span><span>Midnight</span></button>
+      <button class="theme-option" data-accent="emerald"><span class="swatch" style="--swatch:#20a779"></span><span>Emerald</span></button>
+      <button class="theme-option" data-accent="violet"><span class="swatch" style="--swatch:#8b72e8"></span><span>Violet</span></button>
+      <button class="theme-option" data-accent="rose"><span class="swatch" style="--swatch:#df648a"></span><span>Rose</span></button>
+      <button class="theme-option" data-accent="amber"><span class="swatch" style="--swatch:#bd7b16"></span><span>Amber</span></button>
+      <button class="theme-option" data-accent="ocean"><span class="swatch" style="--swatch:#078aa7"></span><span>Ocean</span></button>
+    </div>
+  </section>
+  <section class="theme-live-preview" aria-label="Live theme preview">
+    <div class="preview-brand"><span class="preview-logo"><span class="preview-logo-mark">◌</span></span><div><strong>ModelDeck</strong><small>Your AI workspace</small></div><span class="preview-tune" aria-hidden="true">☷</span></div>
+    <div class="preview-composer"><p>What are we building today?</p><div class="preview-prompt"><span class="preview-send" aria-hidden="true">↑</span><span>Ask anything...</span></div></div>
+    <p class="preview-caption" id="themePreviewCaption">Live preview · Dark appearance · Apple Blue</p>
+  </section>
+  <div class="appearance-foot"><span id="appearanceStatus">Changes apply instantly</span><button class="btn solid" data-close-appearance>Done</button></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body>
+</html>
