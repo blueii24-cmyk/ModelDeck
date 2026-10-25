@@ -86,24 +86,22 @@ const scene = `<svg class="quest-scene" viewBox="0 0 320 96" shape-rendering="cr
 let serial = 0;
 export function createQuestView(message, onPreference = () => {}) {
   const card = document.createElement("section");
-  card.className = "quest-world thinking-card";
-  card.setAttribute("aria-label", "Request workshop");
+  card.className = "quest-world compact-quest thinking-card";
+  card.setAttribute("aria-label", "Request status");
   card.setAttribute("aria-live", "off");
-  const logId = `quest-log-${++serial}`;
-  card.innerHTML = `<div class="quest-hud"><strong>✳ QUEST IN PROGRESS</strong><button type="button" class="quest-toggle" aria-controls="${logId}">Quest log</button></div><div class="quest-model-line"><span class="quest-provider"></span><span> / </span><span class="thinking-model"></span></div><div class="quest-scene-wrap">${scene}<button type="button" class="quest-worker-action" aria-label="What is the worker doing?" aria-expanded="false"></button><span class="quest-task" hidden></span></div><p class="quest-caption" ></p><div class="quest-mini" aria-label="Quest checkpoints"></div><div id="${logId}" class="quest-log"><ol></ol><p class="quest-inspection" hidden></p><small>Frontend milestones, not private model thoughts.</small></div>`;
+  const logId = "quest-log-" + (++serial);
+  card.innerHTML = '<div class="compact-quest-row"><span class="compact-quest-spinner" aria-hidden="true"></span><span class="compact-quest-label"></span><button type="button" class="compact-quest-toggle" aria-controls="' + logId + '" aria-expanded="false">Details</button></div><div class="compact-quest-meta"><span class="quest-provider"></span><span aria-hidden="true"> · </span><span class="thinking-model"></span></div><div id="' + logId + '" class="quest-log" hidden><ol></ol><p class="quest-inspection" hidden></p><small>Request progress only — this does not expose private model thoughts.</small></div>';
   const quest = () => message.quest;
-  let inspected = null,
-    lastStage = null;
-  const list = card.querySelector("ol"),
-    log = card.querySelector(".quest-log"),
-    toggle = card.querySelector(".quest-toggle");
+  let inspected = null;
+  const list = card.querySelector("ol");
+  const log = card.querySelector(".quest-log");
+  const toggle = card.querySelector(".compact-quest-toggle");
   for (const [id, label] of STAGES) {
-    const row = document.createElement("li"),
-      button = document.createElement("button");
+    const row = document.createElement("li");
+    const button = document.createElement("button");
     button.type = "button";
     button.dataset.step = id;
-    button.innerHTML =
-      '<span class="quest-step-icon" aria-hidden="true"></span><span class="quest-step-name"></span><span class="quest-step-state"></span>';
+    button.innerHTML = '<span class="quest-step-icon" aria-hidden="true"></span><span class="quest-step-name"></span><span class="quest-step-state"></span>';
     button.querySelector(".quest-step-name").textContent = label;
     button.title = stageDescription(id, quest().provider);
     button.onclick = () => {
@@ -116,82 +114,41 @@ export function createQuestView(message, onPreference = () => {}) {
     row.append(button);
     list.append(row);
   }
-  for (const [index, [id, label]] of STAGES.entries()) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.dataset.step = id;
-    button.innerHTML =
-      '<span class="quest-step-icon" aria-hidden="true"></span><span>' +
-      ["Prep", "Send", "Wait", "Read", "Done"][index] +
-      "</span>";
-    button.title = label;
-    button.onclick = () => {
-      quest().collapsed = false;
-      list.querySelector(`[data-step="${id}"]`).click();
-      onPreference();
-    };
-    card.querySelector(".quest-mini").append(button);
-  }
   toggle.onclick = () => {
     quest().collapsed = !quest().collapsed;
     update();
     onPreference();
   };
-  const worker = card.querySelector(".quest-worker-action"),
-    task = card.querySelector(".quest-task");
-  task.id = `quest-task-${serial}`;
-  worker.setAttribute("aria-controls", task.id);
-  worker.setAttribute("aria-describedby", task.id);
-  worker.onclick = () => {
-    task.hidden = !task.hidden;
-    worker.setAttribute("aria-expanded", String(!task.hidden));
-  };
   function update() {
     const q = quest();
     card.dataset.stage = q.stage;
     card.classList.toggle("thinking-card", q.stage !== "error");
-    card.querySelector(".quest-hud strong").textContent =
-      q.stage === "error"
-        ? "! QUEST STOPPED"
-        : q.stage === "complete"
-          ? "✓ QUEST COMPLETE"
-          : "✳ QUEST IN PROGRESS";
+    card.setAttribute("aria-label", "Request status: " + q.stage);
+    const labels = {
+      preparing: "Preparing…",
+      sending: "Sending request…",
+      waiting: "Thinking…",
+      receiving: "Receiving response…",
+      finishing: "Finishing up…",
+      complete: "Done",
+      error: "Request stopped",
+    };
+    card.querySelector(".compact-quest-label").textContent = labels[q.stage] || "Working…";
+    card.title = stageDescription(q.stage, q.provider);
+    card.querySelector(".compact-quest-spinner").hidden = ["complete", "error"].includes(q.stage);
     card.querySelector(".quest-provider").textContent = q.provider;
     card.querySelector(".thinking-model").textContent = q.model;
-    if (lastStage !== q.stage) {
-      card.querySelector(".quest-caption").textContent = stageDescription(
-        q.stage,
-        q.provider,
-      );
-      lastStage = q.stage;
-    }
-    task.textContent = "Local worker: " + stageDescription(q.stage, q.provider);
     log.hidden = !!q.collapsed;
     toggle.setAttribute("aria-expanded", String(!q.collapsed));
-    toggle.textContent = q.collapsed ? "Show quest log" : "Hide quest log";
-    for (const button of card.querySelectorAll(".quest-mini button")) {
-      const id = button.dataset.step,
-        state = stageState(q, id);
-      button.dataset.state = state;
-      button.setAttribute(
-        "aria-label",
-        STAGES.find((s) => s[0] === id)[1] + ": " + state,
-      );
-      button.querySelector(".quest-step-icon").textContent = {
-        pending: "▫",
-        active: "▸",
-        completed: "✓",
-        failed: "!",
-      }[state];
-    }
+    toggle.textContent = q.collapsed ? "Details" : "Hide";
     for (const button of list.querySelectorAll("button")) {
-      const id = button.dataset.step,
-        state = stageState(q, id);
+      const id = button.dataset.step;
+      const state = stageState(q, id);
       button.dataset.state = state;
       button.setAttribute("aria-pressed", String(inspected === id));
       button.querySelector(".quest-step-icon").textContent = {
-        pending: "▫",
-        active: "▸",
+        pending: "·",
+        active: "›",
         completed: "✓",
         failed: "!",
       }[state];
