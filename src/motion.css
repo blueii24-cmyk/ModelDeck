@@ -1,0 +1,51 @@
+/* Small, purposeful movements; all motion is optional via the OS preference. */
+:root { --motion-ease: cubic-bezier(.22, 1, .36, 1); }
+.side, .top, .composer-shell, .sheet, .quest, .website-preview {
+  transition: background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+button { transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 200ms var(--motion-ease); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.welcome:not([hidden]) > :not(.quests) { animation: soft-arrival 500ms var(--motion-ease) both; }
+.welcome:not([hidden]) .quest { animation: soft-arrival 500ms var(--motion-ease) backwards; }
+.quest:nth-child(2) { animation-delay: 60ms !important; }
+.quest:nth-child(3) { animation-delay: 120ms !important; }
+.quest:nth-child(4) { animation-delay: 180ms !important; }
+.friend-stage .pixel-friend { animation: pixel-float 4s ease-in-out infinite; }
+.spark { animation: spark-glow 3s ease-in-out infinite; }
+.spark-two { animation-delay: 1s; }
+.spark-three { animation-delay: 2s; }
+.message { animation: soft-arrival 340ms var(--motion-ease) both; }
+.history button[aria-current=true] { background: var(--panel2); color: var(--text); }
+.quick-help { animation: soft-arrival 220ms var(--motion-ease) both; }
+.overlay.open .sheet { animation: sheet-arrival 280ms var(--motion-ease) both; }
+.website-preview { animation: preview-arrival 320ms var(--motion-ease) both; }
+.preview-editor, .preview-canvas:not([hidden]) { animation: soft-arrival 200ms var(--motion-ease) both; }
+.preview-canvas iframe { transition: width 280ms var(--motion-ease); }
+.thinking-card { display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; width: fit-content; max-width: 100%; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; box-shadow: 0 3px 0 #535c390b; }
+.thinking-pixel { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; background: var(--accent-soft); color: var(--accent); font: 27px 'Pixelify Sans', monospace; border-radius: 4px; animation: thinking-breathe 1.8s ease-in-out infinite; }
+.thinking-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.thinking-copy strong { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; }
+.thinking-model { font: 10px/1.6 'IBM Plex Mono', monospace; color: var(--accent); overflow-wrap: anywhere; }
+.thinking-copy small { color: var(--muted); font-size: 11px; line-height: 1.6; }
+.thinking-dots { display: inline-flex; gap: 4px; align-items: center; height: 12px; }
+.thinking-dots b { width: 4px; height: 4px; background: var(--accent); animation: thinking-dot 1.35s ease-in-out infinite; }
+.thinking-dots b:nth-child(2) { animation-delay: 150ms; }
+.thinking-dots b:nth-child(3) { animation-delay: 300ms; }
+.model-area.is-thinking .model-indicator { background: var(--accent); animation: thinking-breathe 1.8s ease-in-out infinite; }
+.composer-shell.is-thinking { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.is-thinking #composerHint { color: var(--accent); }
+.send-pulse { font: 20px 'IBM Plex Mono', monospace; animation: thinking-breathe 1.8s ease-in-out infinite; }
+@keyframes soft-arrival { from { opacity: 0; translate: 0 7px; } to { opacity: 1; translate: 0 0; } }
+@keyframes sheet-arrival { from { opacity: 0; transform: translateY(14px) scale(.985); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes preview-arrival { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes pixel-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes spark-glow { 0%,100% { opacity: .5; } 50% { opacity: 1; } }
+@keyframes thinking-breathe { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes thinking-dot { 0%,60%,100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-3px); opacity: 1; } }
+@media(max-width:760px) {
+  .side { transition: transform 280ms var(--motion-ease), background-color 220ms ease; }
+  .thinking-card { padding: 15px; gap: 11px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}

@@ -62,3 +62,9 @@ Choose **Build something**, or ask a model for a self-contained website in an `h
 The preview includes Preview/Code views, a temporary editable HTML buffer, **Run edits**, reload, desktop/mobile widths, and HTML download. Changing conversations closes the preview. Edits do not overwrite the original response or persist across closing/reloading; download them to keep them.
 
 Generated code runs only after opening the preview, in an iframe with `sandbox="allow-scripts"` and without same-origin access. A restrictive CSP blocks fetches, external scripts/styles/images, nested frames, and form submissions. Inline JavaScript works; the preview cannot read ModelDeck's local storage. This is not a general-purpose hostile-code runtime: generated scripts can still consume browser resources. Inspect untrusted code before running it. Downloaded HTML runs outside this sandbox when opened separately.
+
+## Motion and request status
+
+The interface uses subtle mascot motion, staggered prompt-card arrivals, message transitions, and animated panel entrances. Pending chat requests display a pixel-dot **Thinking** card with the requested model's name, plus composer feedback. This indicates that a request is pending; it does not expose model reasoning or simulate token progress. The indicator clears on success, error, or timeout, and interrupted requests are marked as errors on reload. Switching conversations keeps the pending card with its original chat.
+
+Unchanged message elements are retained to avoid replaying animations and live-region announcements. Completion does not auto-scroll readers away from earlier replies. System **Reduce motion** preferences disable animations and smooth scrolling while preserving readable status text.

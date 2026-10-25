@@ -25,7 +25,7 @@ test('preview runs in isolation, edits, resizes, downloads, closes',async({page}
  await frame.getByRole('button',{name:'Click me'}).click();
  await expect(frame.getByRole('button',{name:'Clicked!'})).toBeVisible();
  await page.getByRole('button',{name:'Mobile preview',exact:true}).click();
- expect(await page.locator('iframe').evaluate(el=>el.getBoundingClientRect().width)).toBeLessThanOrEqual(375);
+ await expect.poll(() => page.locator('iframe').evaluate(el=>el.getBoundingClientRect().width)).toBeLessThanOrEqual(375);
  await page.getByRole('button',{name:'Code',exact:true}).click();
  await page.getByRole('textbox',{name:'Website HTML code'}).fill('<h1>Edited website</h1>');
  await page.getByRole('button',{name:'Run edits'}).click();
