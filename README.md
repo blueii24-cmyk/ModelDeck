@@ -108,3 +108,20 @@ Fast synchronous stages may pass between browser paints. There are **no minimum 
 Artwork and animation are local (`src/thinking/quest.js`, `src/thinking/quest.css`), with no new packages or asset requests. CSS handles decorative loops; there are no animation intervals or request-progress polling. Stage updates patch the existing message card without replacing completed messages or rebuilding the dashboard. A persistent polite screen-reader status announces each milestone, while decorative art and the expanded log are excluded from automatic live announcements. Existing text-chat provider formats, credential handling, model imports, capability icons and website previews are unchanged.
 
 Progress remains limited by the non-streaming provider request flow: a server/proxy may send headers before the actual answer, so the **Receiving** phase can last while the body is still downloading. No remote token progress or reasoning is inferred. Tests use controllable fetch promises/response bodies and fake clocks, not paid provider requests.
+
+### Code, image input, and image output
+
+Assistant messages support sanitized Markdown, tables, inline code, and syntax-highlighted code blocks with **Copy code**. Unknown languages remain readable plain code. Scripts and unsafe HTML are removed; Markdown image references become links rather than automatically fetching arbitrary images. The existing isolated website preview still uses the original response source.
+
+Use **Attach images**, paste an image, or drop files onto the composer to ask a vision-capable model about them. Up to four PNG, JPEG, WebP, or GIF files are accepted per message, each up to 2 MB. Attachments are sent with subsequent conversation context; choose a model that supports image input. SVG is not supported.
+
+Select **Generate image** explicitly to request real image output (provider charges may apply):
+
+- **OpenAI / custom / OmniRoute:** an OpenAI-compatible `/images/generations` endpoint, with text prompts. Image editing is not implemented on this route. A gateway must actually expose this endpoint; a `best-vision` alias alone does not imply generation support.
+- **Gemini:** `generateContent` with text/image response modalities and inline image parts.
+- **OpenRouter:** chat completions with image/text modalities and structured image output.
+- Other providers retain normal chat and compatible vision input; image generation is not implemented for them.
+
+Known incompatible models show guidance before sending. Unknown routing aliases can be attempted, but the upstream provider determines their actual capabilities. A text-only refusal never becomes a fabricated image. Provider payloads are tested using mocks, not paid live API calls.
+
+Image bytes are stored locally in IndexedDB, separately from chat JSON, and sent directly to your selected provider when used as input. If browser storage fails, the UI warns that images are session-only. Clearing history deletes its locally stored images. Generated images can be downloaded; remote HTTPS image URLs can be opened but may expire. Output is limited to four images, with inline images limited to 10 MB each. Assistant-generated images are displayed but are not automatically re-sent as input; download and attach one if needed. Clearing browser site data also removes local images.
