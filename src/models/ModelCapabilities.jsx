@@ -75,7 +75,7 @@ export function CapabilityBadges({ model, compact = false }) {
       {model?.pricingStatus === "free" && (
         <span
           className="free-badge"
-          title="Provider-reported zero pricing at last discovery. Quotas and rate limits still apply."
+          title="OpenRouter-reported zero pricing or documented :free variant at last discovery. Quotas and rate limits still apply."
         >
           FREE
         </span>

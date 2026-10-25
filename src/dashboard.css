@@ -1580,3 +1580,123 @@ html.view-chat .chat-nav {
     letter-spacing: -1px;
   }
 }
+
+
+/* Claude-style model switcher docked inside the message composer. */
+.chat-header-title {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+html.view-chat .composer-toolbar {
+  align-items: center;
+  gap: 12px;
+}
+html.view-chat .composer-toolbar > span {
+  flex: 1;
+  min-width: 0;
+}
+html.view-chat .composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+html.view-chat .composer-model-picker {
+  width: auto;
+  max-width: min(260px, 35vw);
+}
+html.view-chat .composer-model-picker .model-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  max-width: min(260px, 35vw);
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11px;
+}
+html.view-chat .composer-model-picker .model-picker-trigger:hover,
+html.view-chat .composer-model-picker .model-picker-trigger[aria-expanded="true"] {
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--panel2);
+}
+html.view-chat .composer-model-picker .active-model-name {
+  max-width: 175px;
+  font-size: 11px;
+  color: var(--text);
+}
+html.view-chat .composer-model-picker .model-capabilities {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 3px;
+  overflow: hidden;
+  max-width: 45px;
+}
+html.view-chat .composer-model-picker .model-capabilities .capability:not(:first-child) {
+  display: none;
+}
+html.view-chat .composer-model-picker .free-badge {
+  font-size: 7px;
+  padding: 1px 3px;
+}
+html.view-chat .composer-model-picker .model-picker-popup-above {
+  left: auto;
+  right: 0;
+  top: auto;
+  bottom: calc(100% + 9px);
+}
+@media (max-width: 760px) {
+  html.view-chat .composer-toolbar {
+    gap: 6px;
+  }
+  html.view-chat .composer-toolbar > span {
+    font-size: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  html.view-chat .composer-actions {
+    gap: 5px;
+  }
+  html.view-chat .composer-model-picker,
+  html.view-chat .composer-model-picker .model-picker-trigger {
+    max-width: min(185px, 48vw);
+  }
+  html.view-chat .composer-model-picker .active-model-name {
+    max-width: min(125px, 32vw);
+  }
+  html.view-chat .composer-model-picker .model-picker-trigger {
+    min-height: 34px;
+    padding: 0 6px;
+  }
+  html.view-chat .composer-model-picker .model-capabilities {
+    display: none;
+  }
+  html.view-chat .model-picker-popup.model-picker-popup-above {
+    position: fixed;
+    top: auto;
+    bottom: max(105px, calc(env(safe-area-inset-bottom) + 95px));
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: calc(100dvh - 150px);
+  }
+  html.view-chat .model-picker-popup-above [role="listbox"] {
+    max-height: min(45dvh, 320px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.view-chat .composer-model-picker .model-picker-trigger {
+    transition: none;
+  }
+}

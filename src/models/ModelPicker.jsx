@@ -6,7 +6,7 @@ export function ActiveModelCapabilities() {
   const data = useDeck();
   return <CapabilityBadges model={data?.selected.metadata} compact />;
 }
-export default function ModelPicker() {
+export default function ModelPicker({ placement = "header" }) {
   const data = useDeck(),
     [open, setOpen] = useState(false),
     [query, setQuery] = useState("");
@@ -31,7 +31,7 @@ export default function ModelPicker() {
   }, [open]);
   return (
     <div
-      className="rich-model-picker"
+      className={"rich-model-picker " + (placement === "composer" ? "composer-model-picker" : "header-model-picker")}
       ref={root}
       onBlur={(e) => {
         if (open && !e.currentTarget.contains(e.relatedTarget)) setOpen(false);
@@ -92,7 +92,7 @@ export default function ModelPicker() {
         <ChevronDown size={13} />
       </button>
       {open && (
-        <div className="model-picker-popup">
+        <div className={"model-picker-popup" + (placement === "composer" ? " model-picker-popup-above" : "")}>
           <label className="catalog-search">
             Search saved models
             <input

@@ -90,20 +90,38 @@ function costs(value) {
   return n;
 }
 export function pricingFor(provider, raw = {}) {
+  // Only OpenRouter exposes dependable pricing semantics in the supported
+  // catalogue. Its documented :free variant is also a trustworthy free signal.
   if (provider !== "openrouter") return "unknown";
+  const id = [raw.id, raw.canonical_slug, raw.slug].find(
+    (value) => typeof value === "string",
+  ) || "";
+  const freeVariant = id === "openrouter/free" || /:free$/i.test(id);
   const pricing = raw.pricing;
+
+  // If the provider explicitly advertises any positive price, do not call the
+  // model free even if its slug happens to end in :free.
+  if (pricing && typeof pricing === "object" && !Array.isArray(pricing)) {
+    for (const value of Object.values(pricing)) {
+      const n = costs(value);
+      if (n !== null && n > 0) return "paid";
+    }
+  }
+  // OpenRouter's documented :free variant and free router remain identifiable
+  // even when the endpoint omits some or all pricing fields.
+  if (freeVariant) return "free";
   if (!pricing || typeof pricing !== "object" || Array.isArray(pricing))
     return "unknown";
   const input = costs(pricing.prompt),
     output = costs(pricing.completion);
   if (input === null || output === null) return "unknown";
-  if (input > 0 || output > 0) return "paid";
-  // Do not advertise no-cost operation if another advertised charge is nonzero/invalid.
+
+  // Unknown/invalid additional prices remain unknown; explicit nonzero values
+  // were handled above. This avoids labelling partially priced models as free.
   for (const [key, value] of Object.entries(pricing)) {
     if (key === "prompt" || key === "completion") continue;
     const n = costs(value);
     if (n === null) return "unknown";
-    if (n > 0) return "paid";
   }
   return "free";
 }
@@ -318,5 +336,5 @@ export function pricingNotice(connection) {
   const count = connection.modelCatalog.filter(
     (m) => m.pricingStatus === "free",
   ).length;
-  return `${count} verified zero-priced model${count === 1 ? "" : "s"} in the latest response. ${connection.freeModelsOnly ? "Paid and unknown-price models are excluded from discovery results, not deleted from saved models. " : ""}Quotas, rate limits, and provider restrictions still apply. Pricing can change; refresh to recheck.`;
+  return `${count} confirmed free model${count === 1 ? "" : "s"} in the latest response (zero-price metadata or an OpenRouter :free variant). ${connection.freeModelsOnly ? "Paid and unknown-price models are excluded from discovery results, not deleted from saved models. " : ""}Quotas, rate limits, and provider restrictions still apply. Refresh to recheck current pricing.`;
 }

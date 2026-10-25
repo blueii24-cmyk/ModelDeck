@@ -2,7 +2,12 @@ import { test, expect } from '@playwright/test';
 test('welcome, prompts, connections, theme and persisted history', async ({page}) => {
  const errors=[]; page.on('pageerror', e=>errors.push(e.message));
  await page.goto('/');
+ await expect(page.getByRole('heading',{name:"What’s on your mind?"})).toBeVisible();
+ await expect(page.locator('.top .rich-model-picker')).toHaveCount(0);
+ await expect(page.locator('.composer-actions .rich-model-picker')).toBeVisible();
+ await page.getByRole('button',{name:'Model playground'}).click();
  await expect(page.getByRole('heading',{name:'Your AI space.'})).toBeVisible();
+ await page.getByRole('button',{name:'Open chat'}).click();
  await page.getByRole('button',{name:'Build something'}).click();
  await expect(page.getByRole('textbox',{name:'Message ModelDeck'})).toHaveValue(/Help me build/);
  await page.getByRole('button',{name:'Send message'}).click();
