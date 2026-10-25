@@ -88,3 +88,21 @@ test('desktop chat and composer use the available width', async ({ page }) => {
   expect(messages.width).toBeGreaterThan(main.width * 0.65);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
+
+
+test('composer companion idles nearby and reacts when the message box is focused', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  const buddy = page.locator('.chat-buddy');
+  const thought = page.locator('.buddy-thought');
+  const prompt = page.locator('#prompt');
+  await expect(buddy).toBeVisible();
+  await expect(buddy).toHaveAttribute('aria-hidden', 'true');
+  await expect(thought).toHaveCSS('opacity', '0');
+  await prompt.focus();
+  await expect(thought).toHaveCSS('opacity', '1');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const animationName = await page.locator('.chat-buddy').evaluate((el) => getComputedStyle(el).animationName);
+  expect(animationName).toBe('none');
+});
