@@ -81,3 +81,13 @@ Unchanged message elements are retained to avoid replaying animations and live-r
 - Mobile conversations hide the gallery to prioritize chat; **Model playground** reopens it. Connection/model details are collapsible sections. All navigation is in-page, with relative bundled assets for GitHub Pages subpath deployment.
 
 The test suite uses intercepted provider responses, including multiple profiles, Gemini discovery/authentication, Anthropic fallback, credential redaction, and all provider chat formats. It does not claim live provider connectivity or billing validation.
+
+## Free-only imports and model capability icons
+
+In **Models & discovery** (or connection configuration before saving), enable **Free models only** to import models with verified zero pricing. The preference is saved per connection. Toggle it off to show the complete cached catalog; **Refresh models** imports matching entries. Saved and manually entered models stay available regardless of the filter.
+
+**OpenRouter currently supports reliable free filtering** using actual prompt/completion pricing, with conservative checks for additional costs. All other supported providers display “Free status unavailable for this provider”; a trial or free tier is not treated as pricing evidence. Zero-priced models may still have quotas and rate limits.
+
+The searchable model dropdown, discovery rows, provider cards, active chat model, and connection settings share Lucide capability icons and FREE badges. Input/output modalities are distinguished, multiple capabilities can be shown, and unknown models use a neutral icon. Non-text generation workflows are not implemented merely because their models appear in discovery.
+
+See [adapter support, exact-ID fallbacks, pricing rules and limitations](docs/model-metadata.md). Tests cover reversible filtering, saved-model preservation, persistence, malformed pricing, duplicates, directional modalities, unknown capabilities, keyboard selection and mobile layouts, alongside the existing provider/chat/preview regression suite.

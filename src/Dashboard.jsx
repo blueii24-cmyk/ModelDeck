@@ -1,3 +1,4 @@
+import {CapabilityBadges} from './models/ModelCapabilities';
 import React, { useEffect, useState } from "react";
 import {
   ChevronLeft,
@@ -14,7 +15,7 @@ export const dashboardAction = (action, extra = {}) =>
   window.dispatchEvent(
     new CustomEvent("deck:action", { detail: { action, ...extra } }),
   );
-function useDeck() {
+export function useDeck() {
   const [data, setData] = useState(null);
   useEffect(() => {
     const listener = (e) => setData(e.detail);
@@ -154,7 +155,7 @@ export function Dashboard() {
               <p className="model-id" title={p.model}>
                 {p.model || "Choose a model ID"}
               </p>
-              <span className="connection-state">{p.status}</span>
+              <CapabilityBadges model={p.metadata} compact/><span className="connection-state">{p.status}</span>
               {!p.configured && (
                 <small className="suggested-label">
                   Suggested ID · verify with provider
@@ -228,11 +229,11 @@ export function WorkspaceInfo() {
         <div className="model-detail">
           <Avatar index={data.providers.findIndex((p) => p.selected)} />
           <strong>{data.selected.name}</strong>
-          <code>{data.selected.model || "Not selected"}</code>
+          <code>{data.selected.model || "Not selected"}</code><CapabilityBadges model={data.selected.metadata}/>
           <span className="connection-state">{data.selected.status}</span>
         </div>
         <dl>
-          <dt>Models discovered</dt>
+          <dt>Saved models</dt>
           <dd>{data.selected.count}</dd>
           <dt>Saved conversations</dt>
           <dd>{data.chats}</dd>

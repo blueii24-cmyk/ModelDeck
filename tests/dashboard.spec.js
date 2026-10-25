@@ -144,11 +144,11 @@ test("provider editing resets stale models and Gemini discovery uses its own aut
   );
   await expect(page.locator("#apiKey")).toHaveAttribute("type", "password");
   await page.locator("#save").click();
-  await expect(page.locator("#status")).toContainText("Found 1 models");
+  await expect(page.locator("#status")).toContainText("Imported 2 matching models");
   await page.getByRole("button", { name: "Models & discovery" }).click();
   await expect(page.locator("#modelList")).toContainText("gemini-test");
   await expect(page.locator("#modelList")).not.toContainText("old-model");
-  await expect(page.locator("#modelList")).not.toContainText("embedding");
+  await expect(page.locator("#modelList")).toContainText("embedding");
 });
 test("discovery failure is redacted and chat fallback is opt-in with provider-specific auth", async ({
   page,
