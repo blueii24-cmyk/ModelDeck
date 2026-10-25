@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - "index.html"
+      - "src/**"
+      - "package*.json"
+      - "vite.config.js"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
 permissions:
@@ -22,6 +25,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
       - name: Configure and enable Pages
         uses: actions/configure-pages@v5
         with:
@@ -29,7 +38,7 @@ jobs:
       - name: Upload static site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
