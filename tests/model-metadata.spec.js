@@ -49,6 +49,9 @@ test("pricing accepts only trustworthy zero token costs and no other advertised 
   expect(pricingFor("openrouter", { id: "model:free" })).toBe("free");
   expect(pricingFor("openrouter", { id: "openrouter/free" })).toBe("free");
   expect(pricingFor("openrouter", { id: "model:free", pricing: { prompt: "0.1", completion: "0" } })).toBe("paid");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [] } })).toBe("free");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [{ min_prompt_tokens: 1000, prompt: "0", completion: "0" }] } })).toBe("free");
+  expect(pricingFor("openrouter", { id: "model-with-overrides", pricing: { prompt: "0", completion: "0", overrides: [{ min_prompt_tokens: 1000, prompt: "0.1", completion: "0" }] } })).toBe("paid");
 });
 test("capabilities keep input/output and embeddings separate, with neutral unknowns", () => {
   const vision = normalizeModel("openrouter", {

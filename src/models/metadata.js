@@ -89,40 +89,55 @@ function costs(value) {
     return Number.MIN_VALUE;
   return n;
 }
+const pricingControls = new Set(["min_prompt_tokens", "max_prompt_tokens", "utc_days", "utc_start", "utc_end"]);
+function additionalPriceStatus(key, value) {
+  if (pricingControls.has(key)) return "free";
+  if (key === "overrides") {
+    if (!Array.isArray(value)) return "unknown";
+    let unknown = false;
+    for (const override of value) {
+      if (!override || typeof override !== "object" || Array.isArray(override)) return "unknown";
+      for (const [overrideKey, overrideValue] of Object.entries(override)) {
+        const status = additionalPriceStatus(overrideKey, overrideValue);
+        if (status === "paid") return "paid";
+        if (status === "unknown") unknown = true;
+      }
+    }
+    return unknown ? "unknown" : "free";
+  }
+  if (value && typeof value === "object") return "unknown";
+  const n = costs(value);
+  if (n === null) return "unknown";
+  return n > 0 ? "paid" : "free";
+}
+
 export function pricingFor(provider, raw = {}) {
-  // Only OpenRouter exposes dependable pricing semantics in the supported
-  // catalogue. Its documented :free variant is also a trustworthy free signal.
+  // Only OpenRouter exposes dependable pricing semantics in this adapter.
+  // Its documented :free variant and openrouter/free router are explicit provider signals.
   if (provider !== "openrouter") return "unknown";
   const id = [raw.id, raw.canonical_slug, raw.slug].find(
     (value) => typeof value === "string",
   ) || "";
   const freeVariant = id === "openrouter/free" || /:free$/i.test(id);
   const pricing = raw.pricing;
+  const input = pricing && typeof pricing === "object" && !Array.isArray(pricing) ? costs(pricing.prompt) : null;
+  const output = pricing && typeof pricing === "object" && !Array.isArray(pricing) ? costs(pricing.completion) : null;
+  if ((input !== null && input > 0) || (output !== null && output > 0)) return "paid";
 
-  // If the provider explicitly advertises any positive price, do not call the
-  // model free even if its slug happens to end in :free.
+  let unknownExtra = false;
   if (pricing && typeof pricing === "object" && !Array.isArray(pricing)) {
-    for (const value of Object.values(pricing)) {
-      const n = costs(value);
-      if (n !== null && n > 0) return "paid";
+    for (const [key, value] of Object.entries(pricing)) {
+      if (key === "prompt" || key === "completion") continue;
+      const status = additionalPriceStatus(key, value);
+      if (status === "paid") return "paid";
+      if (status === "unknown") unknownExtra = true;
     }
   }
-  // OpenRouter's documented :free variant and free router remain identifiable
-  // even when the endpoint omits some or all pricing fields.
+  // A documented OpenRouter free variant stays identifiable even when the API
+  // omits some prices; any explicit positive base/override price wins above.
   if (freeVariant) return "free";
-  if (!pricing || typeof pricing !== "object" || Array.isArray(pricing))
-    return "unknown";
-  const input = costs(pricing.prompt),
-    output = costs(pricing.completion);
-  if (input === null || output === null) return "unknown";
-
-  // Unknown/invalid additional prices remain unknown; explicit nonzero values
-  // were handled above. This avoids labelling partially priced models as free.
-  for (const [key, value] of Object.entries(pricing)) {
-    if (key === "prompt" || key === "completion") continue;
-    const n = costs(value);
-    if (n === null) return "unknown";
-  }
+  if (!pricing || typeof pricing !== "object" || Array.isArray(pricing)) return "unknown";
+  if (input === null || output === null || unknownExtra) return "unknown";
   return "free";
 }
 export function capabilitiesFor(provider, raw = {}) {
