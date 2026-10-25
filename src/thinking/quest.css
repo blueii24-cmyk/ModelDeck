@@ -1,0 +1,552 @@
+/* An original local pixel workshop. CSS motion never advances request state. */
+.quest-world.thinking-card,
+.quest-world {
+  display: block;
+  width: min(100%, 540px);
+  max-width: 100%;
+  padding: 12px 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  border-radius: 4px;
+  box-shadow: 3px 3px 0 #0002;
+  white-space: normal;
+  color: var(--text);
+  --world-sage: #8faf85;
+  --world-danger: #db8b78;
+}
+.quest-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.quest-hud strong {
+  font:
+    11px "Pixelify Sans",
+    monospace;
+  letter-spacing: 1px;
+  color: var(--accent);
+}
+.quest-toggle {
+  font:
+    9px "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 6px 8px;
+  min-height: 30px;
+  flex-shrink: 0;
+}
+.quest-model-line {
+  font:
+    9px/1.7 "IBM Plex Mono",
+    monospace;
+  color: var(--muted);
+  margin: 5px 0 9px;
+  overflow-wrap: anywhere;
+}
+.quest-model-line .thinking-model {
+  color: var(--text);
+  font: inherit;
+}
+.quest-scene-wrap {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.quest-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 126px;
+  background: var(--bg);
+}
+.world-wall {
+  fill: var(--bg);
+}
+.world-floor {
+  fill: var(--panel2);
+}
+.world-grid {
+  fill: var(--line);
+}
+.world-frame,
+.world-boots {
+  fill: var(--muted);
+}
+.world-metal {
+  fill: var(--line);
+}
+.world-paper {
+  fill: var(--text);
+}
+.world-ink,
+.world-screen {
+  fill: var(--bg);
+}
+.world-accent {
+  fill: var(--accent);
+}
+.world-sage {
+  fill: var(--world-sage);
+}
+.quest-terminal,
+.quest-server-lights,
+.quest-belt {
+  fill: var(--world-sage);
+}
+.quest-worker,
+.quest-runner,
+.quest-parcel,
+.quest-assembly {
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+.quest-parcel,
+.quest-assembly {
+  opacity: 0.3;
+}
+.quest-error-sign {
+  display: none;
+  fill: var(--world-danger);
+}
+.quest-worker-action {
+  position: absolute;
+  left: 11%;
+  top: 31%;
+  width: 16%;
+  height: 52%;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: help;
+}
+.quest-worker-action:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.quest-task {
+  position: absolute;
+  inset: auto 6px 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: 7px;
+  color: var(--text);
+  font-size: 10px;
+  line-height: 1.5;
+  box-shadow: 2px 2px 0 #0003;
+}
+.quest-caption {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 10px 0 0;
+}
+.quest-log {
+  margin-top: 10px;
+  border-top: 1px dashed var(--line);
+  padding-top: 7px;
+}
+.quest-log[hidden],
+.quest-task[hidden],
+.quest-inspection[hidden] {
+  display: none;
+}
+.quest-log ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.quest-log li {
+  margin: 0;
+}
+.quest-log li button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: 2px;
+  padding: 5px 4px;
+  text-align: left;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+.quest-step-icon {
+  font:
+    13px "IBM Plex Mono",
+    monospace;
+  min-width: 12px;
+}
+.quest-step-name {
+  flex: 1;
+}
+.quest-step-state {
+  font:
+    8px "IBM Plex Mono",
+    monospace;
+}
+.quest-log [data-state="active"] {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.quest-log [data-state="completed"] .quest-step-icon {
+  color: var(--world-sage);
+}
+.quest-log [data-state="failed"] {
+  color: var(--world-danger);
+  background: color-mix(in srgb, var(--world-danger) 8%, transparent);
+}
+.quest-log button[aria-pressed="true"] {
+  box-shadow: inset 2px 0 var(--accent);
+}
+.quest-log > small {
+  display: block;
+  color: var(--muted);
+  font-size: 8px;
+  margin: 7px 0 0;
+}
+.quest-inspection {
+  font-size: 10px;
+  color: var(--text);
+  line-height: 1.6;
+  margin: 8px 0 0;
+  padding: 8px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.quest-world[data-stage="preparing"] .quest-worker {
+  transform: translateX(-15px);
+}
+.quest-world[data-stage="preparing"] .quest-board {
+  animation: quest-light 1s steps(2, end) infinite;
+}
+.quest-world[data-stage="sending"] .quest-parcel {
+  opacity: 1;
+  animation: quest-outbound 1.3s linear infinite;
+}
+.quest-world[data-stage="waiting"] .quest-server-lights path {
+  animation: quest-light 1.5s steps(2, end) infinite;
+}
+.quest-world[data-stage="waiting"] .quest-server-lights path:nth-child(2) {
+  animation-delay: 0.3s;
+}
+.quest-world[data-stage="waiting"] .quest-server-lights path:nth-child(3) {
+  animation-delay: 0.6s;
+}
+.quest-world[data-stage="waiting"] .quest-runner {
+  animation: quest-roundtrip 5s steps(18, end) infinite;
+}
+.quest-world[data-stage="waiting"] .quest-hands,
+.quest-world[data-stage="sending"] .quest-hands {
+  animation: quest-type 0.6s steps(2, end) infinite;
+}
+.quest-world[data-stage="waiting"] .quest-cursor {
+  animation: quest-light 1s steps(2, end) infinite;
+}
+.quest-world[data-stage="waiting"] .quest-belt {
+  animation: quest-light 2s steps(2, end) infinite;
+}
+.quest-world[data-stage="receiving"] .quest-parcel {
+  opacity: 1;
+  animation: quest-inbound 1.1s linear infinite;
+}
+.quest-world[data-stage="receiving"] .quest-assembly {
+  opacity: 1;
+  animation: quest-build 1s steps(3, end) infinite;
+}
+.quest-world[data-stage="finishing"] .quest-worker {
+  transform: translateX(176px);
+}
+.quest-world[data-stage="finishing"] .quest-assembly,
+.quest-world[data-stage="complete"] .quest-assembly {
+  opacity: 1;
+}
+.quest-world[data-stage="complete"] .quest-runner {
+  transform: translateY(-4px);
+}
+.quest-world[data-stage="error"] {
+  border-top-color: var(--world-danger);
+}
+.quest-world[data-stage="error"] .quest-hud strong {
+  color: var(--world-danger);
+}
+.quest-world[data-stage="error"] .quest-error-sign {
+  display: block;
+}
+.quest-world[data-stage="error"] .quest-server-lights {
+  fill: var(--world-danger);
+}
+.quest-world[data-stage="error"] .quest-scene {
+  max-height: 82px;
+}
+.quest-world[data-stage="error"] .quest-log {
+  display: none;
+}
+.quest-world[data-stage="error"]:has(.quest-toggle[aria-expanded="true"])
+  .quest-log {
+  display: block;
+}
+.quest-world[data-stage="error"] * {
+  animation: none !important;
+}
+.quest-error-copy {
+  white-space: pre-wrap;
+  margin-top: 12px;
+}
+.message.assistant {
+  position: relative;
+}
+.quest-delivery {
+  position: absolute;
+  right: 4px;
+  top: 0;
+  color: var(--accent);
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  animation: quest-delivered 0.65s ease-out both;
+}
+.quest-delivery svg {
+  display: block;
+  width: 100%;
+}
+@keyframes quest-type {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes quest-light {
+  50% {
+    opacity: 0.35;
+  }
+}
+@keyframes quest-roundtrip {
+  0%,
+  20%,
+  100% {
+    transform: translateX(0);
+  }
+  50%,
+  70% {
+    transform: translateX(33px);
+  }
+}
+@keyframes quest-outbound {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(58px);
+  }
+}
+@keyframes quest-inbound {
+  from {
+    transform: translateX(58px);
+  }
+  to {
+    transform: translateX(114px);
+  }
+}
+@keyframes quest-build {
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes quest-delivered {
+  0% {
+    opacity: 0;
+    transform: translate(-20px, 8px);
+  }
+  25%,
+  65% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+@media (max-width: 760px) {
+  .quest-world.thinking-card,
+  .quest-world {
+    padding: 10px;
+  }
+  .quest-hud strong {
+    font-size: 10px;
+    letter-spacing: 0.4px;
+  }
+  .quest-toggle {
+    min-height: 36px;
+    font-size: 8px;
+    padding: 5px;
+  }
+  .quest-scene {
+    max-height: 90px;
+  }
+  .quest-caption {
+    font-size: 10px;
+  }
+  .quest-log li button {
+    min-height: 34px;
+    padding: 5px 3px;
+    font-size: 9px;
+  }
+  .quest-step-state {
+    font-size: 7px;
+  }
+  .quest-model-line {
+    font-size: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-world *,
+  .quest-delivery {
+    animation: none !important;
+    transition: none !important;
+  }
+  .quest-delivery {
+    display: none;
+  }
+  .quest-worker,
+  .quest-runner,
+  .quest-parcel {
+    transform: none !important;
+  }
+}
+.quest-mini {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin-top: 10px;
+}
+.quest-mini button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 28px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  border-radius: 2px;
+  color: var(--muted);
+  font:
+    8px "IBM Plex Mono",
+    monospace;
+}
+.quest-mini [data-state="active"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+.quest-mini [data-state="completed"] .quest-step-icon {
+  color: var(--world-sage);
+}
+.quest-mini [data-state="failed"] {
+  color: var(--world-danger);
+  border-color: var(--world-danger);
+}
+.quest-mini [data-state="active"] .quest-step-icon {
+  animation: quest-light 1.5s steps(2, end) infinite;
+}
+@media (max-width: 760px) {
+  .quest-mini {
+    gap: 3px;
+  }
+  .quest-mini button {
+    min-height: 32px;
+    font-size: 7px;
+    gap: 3px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .quest-mini [data-state="active"] .quest-step-icon {
+    animation: none;
+  }
+}
+.quest-world[data-stage="receiving"] .quest-worker {
+  transform: translateX(176px);
+}
+/* The compact world fits the existing chat viewport; details expand only on demand. */
+@media (min-width: 761px) {
+  .quest-world.thinking-card,
+  .quest-world {
+    padding: 10px 12px;
+  }
+  .quest-toggle {
+    min-height: 24px;
+    padding: 3px 7px;
+  }
+  .quest-scene-wrap {
+    max-width: 320px;
+  }
+  .quest-scene {
+    max-height: 96px;
+  }
+  .quest-model-line {
+    margin: 3px 0 6px;
+  }
+  .quest-caption {
+    margin-top: 6px;
+  }
+  .quest-mini {
+    margin-top: 5px;
+  }
+}
+.quest-delivery::before {
+  content: "QUEST COMPLETE";
+  position: absolute;
+  right: 35px;
+  top: 9px;
+  white-space: nowrap;
+  color: var(--accent);
+  font:
+    9px "Pixelify Sans",
+    monospace;
+  background: var(--panel);
+  padding: 2px 4px;
+}
+@media (max-width: 760px) {
+  .quest-hud strong {
+    font-size: 11px;
+  }
+  .quest-toggle {
+    font-size: 9px;
+  }
+  .quest-caption {
+    font-size: 11px;
+  }
+  .quest-mini button {
+    font-size: 9px;
+    gap: 2px;
+    padding: 4px 2px;
+  }
+  .quest-mini .quest-step-icon {
+    font-size: 11px;
+    min-width: 10px;
+  }
+  .quest-log li button {
+    font-size: 10px;
+  }
+}
+/* A persistent live region announces milestones, never animation frames or the whole log. */
+.quest-announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  pointer-events: none;
+}

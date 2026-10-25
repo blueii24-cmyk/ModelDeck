@@ -67,7 +67,7 @@ Generated code runs only after opening the preview, in an iframe with `sandbox="
 
 ## Motion and request status
 
-The interface uses subtle mascot motion, staggered prompt-card arrivals, message transitions, and animated panel entrances. Pending chat requests display a pixel-dot **Thinking** card with the requested model's name, plus composer feedback. This indicates that a request is pending; it does not expose model reasoning or simulate token progress. The indicator clears on success, error, or timeout, and interrupted requests are marked as errors on reload. Switching conversations keeps the pending card with its original chat.
+The interface uses subtle mascot motion, staggered prompt-card arrivals, message transitions, and animated panel entrances. Pending chat requests display an interactive pixel workshop and five-stage quest with the requested model's name, plus composer feedback. This indicates that a request is pending; it does not expose model reasoning or simulate token progress. The indicator clears on success, error, or timeout, and interrupted requests are marked as errors on reload. Switching conversations keeps the pending card with its original chat.
 
 Unchanged message elements are retained to avoid replaying animations and live-region announcements. Completion does not auto-scroll readers away from earlier replies. System **Reduce motion** preferences disable animations and smooth scrolling while preserving readable status text.
 
@@ -91,3 +91,20 @@ In **Models & discovery** (or connection configuration before saving), enable **
 The searchable model dropdown, discovery rows, provider cards, active chat model, and connection settings share Lucide capability icons and FREE badges. Input/output modalities are distinguished, multiple capabilities can be shown, and unknown models use a neutral icon. Non-text generation workflows are not implemented merely because their models appear in discovery.
 
 See [adapter support, exact-ID fallbacks, pricing rules and limitations](docs/model-metadata.md). Tests cover reversible filtering, saved-model preservation, persistence, malformed pricing, duplicates, directional modalities, unknown capabilities, keyboard selection and mobile layouts, alongside the existing provider/chat/preview regression suite.
+
+## Pixel workshop and request quests
+
+A compact original SVG workshop now replaces the simple thinking dots. A terminal worker, parcel conveyor, server lamps, and a reply desk respond to **frontend lifecycle events**, not remote private thoughts. The five checkpoints are tappable; expand the quest log for descriptions or tap the worker for its current local task. Each pending message stores its own stage, reached checkpoints, provider/model labels, and collapsed-log preference.
+
+- **Preparing:** the local conversation context and provider payload are being built.
+- **Sending:** the browser's fetch function is being invoked. This is not proof that a remote server has accepted the request.
+- **Waiting:** the fetch promise is pending; response headers have not arrived.
+- **Receiving:** response headers arrived; the body is being read and checked. This includes error bodies and does not imply success.
+- **Finishing / complete:** a nonempty provider answer has been validated and is passed to the renderer.
+- **Stopped:** HTTP/network errors, invalid/empty replies, timeouts, and interrupted requests on reload show a paused error scene and the existing actionable error message. Later checkpoints are not marked complete.
+
+Fast synchronous stages may pass between browser paints. There are **no minimum stage durations, fake percentages, token streaming, or added request delays**. The answer appears immediately; a short decorative document-delivery/“QUEST COMPLETE” flourish accompanies it rather than holding it back. Background completion does not replay that flourish when another chat is opened. Reduced-motion users see static artwork and the same readable statuses.
+
+Artwork and animation are local (`src/thinking/quest.js`, `src/thinking/quest.css`), with no new packages or asset requests. CSS handles decorative loops; there are no animation intervals or request-progress polling. Stage updates patch the existing message card without replacing completed messages or rebuilding the dashboard. A persistent polite screen-reader status announces each milestone, while decorative art and the expanded log are excluded from automatic live announcements. Existing text-chat provider formats, credential handling, model imports, capability icons and website previews are unchanged.
+
+Progress remains limited by the non-streaming provider request flow: a server/proxy may send headers before the actual answer, so the **Receiving** phase can last while the body is still downloading. No remote token progress or reasoning is inferred. Tests use controllable fetch promises/response bodies and fake clocks, not paid provider requests.
