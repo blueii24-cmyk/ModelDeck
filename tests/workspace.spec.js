@@ -125,9 +125,19 @@ test('chat picker filters to confirmed free models and supports OpenRouter Free 
   await expect(picker.getByRole('option', { name: /Paid Chat/ })).toHaveCount(0);
   await expect(picker.getByRole('option', { name: /Unknown Price/ })).toHaveCount(0);
   await expect(picker.getByRole('option', { name: /Free Auto/ })).toBeVisible();
+  const filterState = await page.evaluate(() => JSON.parse(localStorage.getItem('modeldeck-ghpages-v2')));
+  expect(filterState.connections[0].chatFreeOnly).toBe(true);
 
-  await picker.getByRole('option', { name: /Free Auto/ }).click();
-  await expect(picker.getByRole('button', { name: 'Switch model', exact: true })).toContainText('Free Auto');
+  await page.reload();
+  const reloadedPicker = page.locator('.composer-model-picker');
+  await reloadedPicker.getByRole('button', { name: 'Switch model', exact: true }).click();
+  const reloadedToggle = reloadedPicker.getByRole('button', { name: 'Free models only', exact: true });
+  await expect(reloadedToggle).toHaveAttribute('aria-pressed', 'true');
+  await expect(reloadedPicker.getByRole('option', { name: /Paid Chat/ })).toHaveCount(0);
+  await expect(reloadedPicker.getByRole('option', { name: /Free Chat/ })).toBeVisible();
+
+  await reloadedPicker.getByRole('option', { name: /Free Auto/ }).click();
+  await expect(reloadedPicker.getByRole('button', { name: 'Switch model', exact: true })).toContainText('Free Auto');
   const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('modeldeck-ghpages-v2')));
   expect(persisted.connections[0].model).toBe('openrouter/free');
   expect(persisted.connections[0].chatFreeOnly).toBe(true);
