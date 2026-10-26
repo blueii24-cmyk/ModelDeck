@@ -75,7 +75,7 @@ test('preview console collects runtime messages and web-resource toggle reloads 
       model: 'openai/gpt-4o-mini',
       messages: [{
         role: 'assistant',
-        content: '<!doctype html><html><head><title>Console test</title></head><body><h1>Game canvas</h1><script>console.log("hello game"); console.error("boom");</script></body></html>'
+        content: '<!doctype html><html><head><title>Console test</title></head><body><h1>Game canvas</h1><script>localStorage.setItem("modeldeck-test", "ready"); console.log("storage=" + localStorage.getItem("modeldeck-test")); console.log("hello game"); console.error("boom");</script></body></html>'
       }]
     }]
   })));
@@ -83,6 +83,7 @@ test('preview console collects runtime messages and web-resource toggle reloads 
   await page.getByRole('button', { name: 'Preview website' }).click();
   await page.getByRole('tab', { name: 'Console' }).click();
   await expect(page.locator('.preview-console-row.log pre')).toContainText('hello game');
+  await expect(page.locator('.preview-console-row.log pre')).toContainText('storage=ready');
   await expect(page.locator('.preview-console-row.error pre')).toContainText('boom');
 
   await page.getByRole('button', { name: 'Toggle web resources' }).click();

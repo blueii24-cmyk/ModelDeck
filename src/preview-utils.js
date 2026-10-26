@@ -22,6 +22,13 @@ function consoleBridge(channel) {
   return [
     "(() => {",
     "  const channel = " + JSON.stringify(channel) + ";",
+    "  const makeSessionStorage = () => {",
+    "    const data = new Map();",
+    "    return { get length() { return data.size; }, key(index) { return [...data.keys()][index] ?? null; }, getItem(key) { const k = String(key); return data.has(k) ? data.get(k) : null; }, setItem(key, value) { data.set(String(key), String(value)); }, removeItem(key) { data.delete(String(key)); }, clear() { data.clear(); } };",
+    "  };",
+    "  for (const name of ['localStorage', 'sessionStorage']) {",
+    "    try { void window[name]; } catch { try { Object.defineProperty(window, name, { configurable: true, value: makeSessionStorage() }); } catch {} }",
+    "  }",
     "  const text = (value) => {",
     "    if (typeof value === 'string') return value;",
     "    if (value instanceof Error) return value.stack || value.message || String(value);",
