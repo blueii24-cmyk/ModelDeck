@@ -115,8 +115,11 @@ function messageView(message) {
     } else if(message.role==='assistant'&&!message.error)renderMarkdown(node,String(message.content??''));else node.textContent=String(message.content??'');
     renderImages(node,message.attachments);
     if (message.role === 'assistant' && !message.error) {
-      const source = extractWebsite(String(message.content ?? ''));
-      if (source) {
+      const messageSource = String(message.content ?? '');
+      const source = extractWebsite(messageSource);
+      const hasHtmlFence = /\x60{3}(?:html|htm)\b/i.test(messageSource) ||
+        /\x60{3}\s*\r?\n\s*(?:<!doctype html|<html[\s>])/i.test(messageSource);
+      if (source && !hasHtmlFence) {
         const button = document.createElement('button');
         button.type = 'button'; button.className = 'website-preview-button'; button.textContent = '▣ Preview website ↗';
         button.onclick = () => window.dispatchEvent(new CustomEvent('modeldeck:preview', {detail:{source}}));

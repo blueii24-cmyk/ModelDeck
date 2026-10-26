@@ -48,3 +48,48 @@ test('mobile preview fits and conversation changes dismiss it',async({page})=>{
  await page.locator('#newChat').click();
  await expect(page.locator('iframe')).toHaveCount(0);
 });
+
+
+test('sandbox keeps web requests off by default and can opt in to website/game resources', () => {
+  const offline = sandboxDocument('<h1>Offline</h1>', { channel: 'test-channel' });
+  expect(offline).toContain("connect-src 'none'");
+  expect(offline).toContain("worker-src blob: data:");
+  expect(offline).toContain('modeldeck-preview-console');
+  expect(offline).toContain('test-channel');
+
+  const online = sandboxDocument('<h1>Online</h1>', {
+    allowExternalResources: true,
+    channel: 'web-channel',
+  });
+  expect(online).toContain('connect-src https: wss:');
+  expect(online).toContain("script-src 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https: data: blob:");
+  expect(online).toContain('worker-src https: blob: data:');
+});
+
+test('preview console collects runtime messages and web-resource toggle reloads in isolation', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('modeldeck-ghpages-v2', JSON.stringify({
+    chats: [{
+      id: 'console-preview',
+      title: 'Console test',
+      provider: 'openrouter',
+      model: 'openai/gpt-4o-mini',
+      messages: [{
+        role: 'assistant',
+        content: '<!doctype html><html><head><title>Console test</title></head><body><h1>Game canvas</h1><script>console.log("hello game"); console.error("boom");</script></body></html>'
+      }]
+    }]
+  })));
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Preview website' }).click();
+  await page.getByRole('tab', { name: 'Console' }).click();
+  await expect(page.locator('.preview-console-row.log pre')).toContainText('hello game');
+  await expect(page.locator('.preview-console-row.error pre')).toContainText('boom');
+
+  await page.getByRole('button', { name: 'Toggle web resources' }).click();
+  await expect(page.getByRole('button', { name: 'Toggle web resources' })).toHaveAttribute('aria-pressed', 'true');
+  const frame = page.frameLocator('iframe[title="Generated website"]');
+  await expect(frame.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveAttribute('content', /connect-src https: wss:/);
+  await page.getByRole('button', { name: 'Tablet preview' }).click();
+  await expect(page.locator('.preview-canvas.tablet iframe')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Fullscreen preview' })).toBeVisible();
+});

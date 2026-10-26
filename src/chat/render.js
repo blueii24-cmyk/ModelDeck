@@ -19,9 +19,12 @@ const marked = new Marked({
 import DOMPurify from "dompurify";
 import hljs from "highlight.js/lib/common";
 import { readImage } from "./media";
+import { extractWebsite } from "../preview-utils";
 export function renderMarkdown(container, text) {
   const body = document.createElement("div");
   body.className = "markdown-body";
+  const previewSource = extractWebsite(String(text || ""));
+  let previewAdded = false;
   body.innerHTML = DOMPurify.sanitize(
     marked.parse(String(text || ""), { gfm: true, breaks: true }),
     {
@@ -52,11 +55,24 @@ export function renderMarkdown(container, text) {
   for (const code of body.querySelectorAll("pre > code")) {
     const raw = code.textContent;
     const language =
-      [...code.classList].find((c) => c.startsWith("language-"))?.slice(9) ||
+      [...code.classList].find((c) => c.startsWith("language-"))?.slice(9).toLowerCase() ||
       "text";
-    if (raw.length < 100000 && hljs.getLanguage(language)) {
+    const highlightLanguage = ({
+      html: "xml",
+      htm: "xml",
+      svg: "xml",
+      js: "javascript",
+      jsx: "javascript",
+      ts: "typescript",
+      tsx: "typescript",
+      py: "python",
+      sh: "bash",
+      shell: "bash",
+      yml: "yaml",
+    })[language] || language;
+    if (raw.length < 100000 && hljs.getLanguage(highlightLanguage)) {
       code.innerHTML = hljs.highlight(raw, {
-        language,
+        language: highlightLanguage,
         ignoreIllegals: true,
       }).value;
       code.classList.add("hljs");
@@ -87,7 +103,25 @@ export function renderMarkdown(container, text) {
       }
     };
     copy.onblur = () => (copy.textContent = "Copy code");
-    bar.append(label, copy);
+    const actions = document.createElement("div");
+    actions.className = "code-toolbar-actions";
+    actions.append(copy);
+    const isHtmlBlock =
+      /^(html|htm)$/i.test(language) ||
+      ((!language || language === "text") && /^\s*(<!doctype html|<html[\s>])/i.test(raw));
+    if (previewSource && !previewAdded && isHtmlBlock) {
+      const preview = document.createElement("button");
+      preview.type = "button";
+      preview.className = "code-preview-action";
+      preview.textContent = "Preview website";
+      preview.setAttribute("aria-label", "Preview website");
+      preview.onclick = () => window.dispatchEvent(
+        new CustomEvent("modeldeck:preview", { detail: { source: previewSource } }),
+      );
+      actions.append(preview);
+      previewAdded = true;
+    }
+    bar.append(label, actions);
     block.append(bar, pre);
   }
   for (const table of body.querySelectorAll("table")) {

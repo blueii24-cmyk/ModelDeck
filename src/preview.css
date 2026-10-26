@@ -3,3 +3,184 @@
 @media(min-width:1101px){.preview-open .app{margin-right:46vw;grid-template-columns:195px minmax(0,1fr)}.preview-open .side{padding-left:13px;padding-right:13px}.preview-open .brand{font-size:21px}.preview-open .top{padding:0 18px}.preview-open .byok,.preview-open .header-divider{display:none}.preview-open .modelpick{max-width:220px}.preview-open .hint>span:last-child{display:none}.preview-open .main-footer>span{display:none}.preview-open .composer-toolbar>span{font-size:9px}.preview-open .chat{padding:0 20px}.preview-open .composer-wrap{padding-left:20px;padding-right:20px}}
 @media(max-width:1100px){.website-preview{width:min(680px,100vw);max-width:100%;min-width:0;z-index:45;box-shadow:-20px 0 90px #0004}}
 @media(max-width:600px){.website-preview{width:100%;height:var(--visual-height,100dvh)}.preview-heading{padding:16px}.preview-canvas{padding:8px}.preview-notice{padding-bottom:max(12px,env(safe-area-inset-bottom))}}
+
+
+/* Expanded sandbox preview controls, viewport presets, and runtime console. */
+.preview-controls {
+  flex-wrap: wrap;
+}
+.preview-tabs button {
+  white-space: nowrap;
+}
+.preview-tabs button[aria-selected="true"] {
+  color: var(--text);
+}
+.preview-error-count {
+  min-width: 17px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  background: #b64040;
+  color: white;
+  font: 10px "IBM Plex Mono", monospace;
+  text-align: center;
+}
+.preview-actions {
+  flex-wrap: wrap;
+  row-gap: 5px;
+}
+.preview-actions button {
+  min-height: 32px;
+  white-space: nowrap;
+}
+.preview-actions button:last-child {
+  margin-left: auto;
+}
+.preview-network {
+  border-color: var(--line) !important;
+  background: var(--panel) !important;
+}
+.preview-network span {
+  min-width: 20px;
+  font: 9px "IBM Plex Mono", monospace;
+}
+.preview-network.enabled {
+  color: var(--text) !important;
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line)) !important;
+  background: var(--accent-soft) !important;
+}
+.preview-canvas.desktop iframe {
+  width: 100%;
+}
+.preview-canvas.tablet iframe {
+  width: 768px;
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+.preview-canvas.mobile iframe {
+  width: 390px;
+  max-width: 100%;
+  flex: 0 0 auto;
+}
+.preview-console {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  background: var(--bg);
+  overflow: hidden;
+}
+.preview-console[hidden] {
+  display: none;
+}
+.preview-console-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font: 10px "IBM Plex Mono", monospace;
+}
+.preview-console-heading button {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 5px 9px;
+  font: inherit;
+}
+.preview-console-count {
+  margin-left: 5px;
+  opacity: .7;
+}
+.preview-console-empty {
+  padding: 20px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.preview-console-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.preview-console-row {
+  display: grid;
+  grid-template-columns: auto 46px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 8px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent);
+  font-size: 11px;
+}
+.preview-console-row.warn {
+  background: color-mix(in srgb, #ce8a28 9%, transparent);
+}
+.preview-console-row.error {
+  background: color-mix(in srgb, #c84545 10%, transparent);
+}
+.preview-console-time {
+  color: var(--muted);
+  font: 9px "IBM Plex Mono", monospace;
+  white-space: nowrap;
+}
+.preview-console-level {
+  text-transform: uppercase;
+  font: 9px "IBM Plex Mono", monospace;
+  color: var(--muted);
+}
+.preview-console-row.error .preview-console-level {
+  color: #c84545;
+}
+.preview-console-row.warn .preview-console-level {
+  color: #b77a1c;
+}
+.preview-console-row pre {
+  min-width: 0;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 11px/1.55 "IBM Plex Mono", monospace;
+  color: var(--text);
+}
+.preview-notice {
+  max-height: 90px;
+  overflow-y: auto;
+}
+@media (max-width: 600px) {
+  .preview-controls {
+    padding: 8px 9px;
+    gap: 6px;
+  }
+  .preview-tabs {
+    gap: 0;
+  }
+  .preview-controls button {
+    padding: 8px 7px;
+    font-size: 10px;
+  }
+  .preview-actions {
+    padding: 0 8px 8px;
+    gap: 3px;
+  }
+  .preview-actions button {
+    padding: 7px 8px;
+    font-size: 10px;
+  }
+  .preview-actions button:last-child {
+    margin-left: 0;
+  }
+  .preview-network {
+    margin-left: auto;
+  }
+  .preview-console-row {
+    grid-template-columns: 1fr 42px;
+    gap: 4px 8px;
+  }
+  .preview-console-row pre {
+    grid-column: 1 / -1;
+  }
+}
